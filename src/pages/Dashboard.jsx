@@ -12,19 +12,26 @@ import { startOfDay, startOfWeek, startOfMonth } from "date-fns";
 export default function Dashboard() {
   const [companies, setCompanies] = useState([]);
   const [documents, setDocuments] = useState([]);
+  const [agentDocs, setAgentDocs] = useState([]);
   const [loading, setLoading] = useState(true);
 
+  const load = async () => {
+    const [comps, docs, aDocs] = await Promise.all([
+      base44.entities.Company.list("-created_date", 100),
+      base44.entities.FiscalDocument.list("-created_date", 200),
+      base44.entities.Document.list("-created_date", 200),
+    ]);
+    setCompanies(comps);
+    setDocuments(docs);
+    setAgentDocs(aDocs);
+    setLoading(false);
+  };
+
   useEffect(() => {
-    const load = async () => {
-      const [comps, docs] = await Promise.all([
-        base44.entities.Company.list("-created_date", 100),
-        base44.entities.FiscalDocument.list("-created_date", 200),
-      ]);
-      setCompanies(comps);
-      setDocuments(docs);
-      setLoading(false);
-    };
     load();
+    // Auto-refresh a cada 30s para refletir novos envios do agente
+    const interval = setInterval(load, 30000);
+    return () => clearInterval(interval);
   }, []);
 
   const now = new Date();
