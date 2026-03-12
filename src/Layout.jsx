@@ -33,8 +33,12 @@ export default function Layout({ children, currentPageName }) {
 
   useEffect(() => {
     const loadUser = async () => {
-      const u = await base44.auth.me();
-      setUser(u);
+      try {
+        const u = await base44.auth.me();
+        setUser(u);
+      } catch (e) {
+        console.error("Erro ao carregar usuário no layout:", e);
+      }
     };
     loadUser();
   }, []);
