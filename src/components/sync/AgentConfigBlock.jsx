@@ -71,8 +71,8 @@ token: "${token || "SEU_TOKEN_AQUI"}"
           <p className="font-mono text-slate-700">multipart/form-data</p>
         </div>
         <div className="p-3 rounded-lg bg-blue-50 space-y-1.5">
-          <p className="text-blue-400 font-medium uppercase tracking-wide text-[10px]">Company ID</p>
-          <p className="font-mono text-blue-700 break-all">{companyId || "—"}</p>
+          <p className="text-blue-400 font-medium uppercase tracking-wide text-[10px]">Company ID (automático via token)</p>
+          <p className="font-mono text-blue-700 break-all">{companyId || "—"} <span className="text-blue-400 text-[10px] font-sans">(não precisa enviar)</span></p>
         </div>
         <div className="p-3 rounded-lg bg-emerald-50 space-y-1.5">
           <p className="text-emerald-400 font-medium uppercase tracking-wide text-[10px]">Token (Bearer)</p>
