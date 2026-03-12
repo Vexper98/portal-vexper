@@ -32,6 +32,7 @@ export default function ContadorPanel({ user }) {
   const [filterCompany, setFilterCompany] = useState("all");
   const [filterType, setFilterType] = useState("all");
   const [selected, setSelected] = useState([]);
+  const navigate = useNavigate();
 
   const load = async () => {
     setLoading(true);
