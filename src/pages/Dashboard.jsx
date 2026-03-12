@@ -21,8 +21,8 @@ export default function Dashboard() {
     if (manual) setRefreshing(true);
     const [u, comps, docs] = await Promise.all([
       base44.auth.me(),
-      base44.entities.Company.list("-created_date", 5000),
-      base44.entities.Document.list("-created_date", 5000),
+      base44.entities.Company.list("-created_date", 20000),
+      base44.entities.Document.list("-created_date", 20000),
     ]);
     const restricted = u?.role === "contador";
     const myCompanies = restricted
