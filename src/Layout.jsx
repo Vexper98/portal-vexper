@@ -4,7 +4,7 @@ import { base44 } from "@/api/base44Client";
 import { createPageUrl } from "@/utils";
 import {
   LayoutDashboard, Building2, FileText, Upload, Bell, BarChart3,
-  Settings, LogOut, Menu, X, ChevronDown, Shield, User as UserIcon
+  Settings, LogOut, Menu, X, ChevronDown, Shield, User as UserIcon, Zap
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -19,6 +19,7 @@ const NAV_ITEMS = [
   { name: "Enviar Arquivos", icon: Upload, page: "DocumentUpload", roles: ["admin", "contador", "empresa"] },
   { name: "Notificações", icon: Bell, page: "Notifications", roles: ["admin", "contador", "suporte", "empresa"] },
   { name: "Relatórios", icon: BarChart3, page: "Reports", roles: ["admin", "contador"] },
+  { name: "Agente Sync", icon: Zap, page: "SyncAgent", roles: ["admin", "contador"] },
   { name: "Configurações", icon: Settings, page: "Settings", roles: ["admin"] },
 ];
 
