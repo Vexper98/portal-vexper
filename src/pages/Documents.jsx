@@ -353,6 +353,9 @@ export default function Documents() {
                           <DropdownMenuItem onClick={() => handleDownload(doc)}>
                             <Download className="w-4 h-4 mr-2" /> Baixar XML
                           </DropdownMenuItem>
+                          <DropdownMenuItem onClick={() => handleDownloadOriginal(doc)}>
+                            <Download className="w-4 h-4 mr-2" /> Baixar Original
+                          </DropdownMenuItem>
                           <DropdownMenuItem
                             className="text-red-600"
                             onClick={() => setDeleteTarget(doc)}
