@@ -56,7 +56,8 @@ export default function Layout({ children, currentPageName }) {
     loadNotifications();
   }, [user, currentPageName]);
 
-  const userRole = user?.role || "empresa";
+  const knownRoles = ["admin", "contador", "suporte", "empresa"];
+  const userRole = knownRoles.includes(user?.role) ? user.role : "empresa";
   const filteredNav = NAV_ITEMS.filter(item => item.roles.includes(userRole));
 
   const handleLogout = () => {
