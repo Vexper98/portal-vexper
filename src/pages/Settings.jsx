@@ -22,7 +22,7 @@ const roleLabel = { admin: "Administrador", contador: "Contador", empresa: "Empr
 
 const roleIcon = { admin: "🔴", contador: "🔵", empresa: "🟢", suporte: "🟣" };
 
-function AdminPanel({ users, onInvite }) {
+function AdminPanel({ users, onInvite, onEditRole }) {
   const stats = [
     { label: "Total Usuários", value: users.length, icon: Users, color: "from-blue-500 to-cyan-500" },
     { label: "Admins", value: users.filter(u => u.role === "admin").length, icon: Shield, color: "from-red-500 to-pink-500" },
