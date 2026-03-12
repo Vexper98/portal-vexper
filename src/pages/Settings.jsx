@@ -165,6 +165,17 @@ export default function Settings() {
     load();
   }, []);
 
+  const handleEditRole = async () => {
+    if (!editRoleUser || !editRoleValue) return;
+    setSavingRole(true);
+    await base44.entities.User.update(editRoleUser.id, { role: editRoleValue });
+    toast.success(`Perfil de ${editRoleUser.full_name || editRoleUser.email} atualizado para ${roleLabel[editRoleValue] || editRoleValue}`);
+    setSavingRole(false);
+    setEditRoleUser(null);
+    const u = await base44.entities.User.list("-created_date", 100);
+    setUsers(u);
+  };
+
   const handleInvite = async () => {
     if (!inviteEmail) return;
     setInviting(true);
