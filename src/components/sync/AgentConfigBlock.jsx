@@ -5,6 +5,7 @@ import { base44 } from "@/api/base44Client";
 
 export default function AgentConfigBlock({ token, companyId }) {
   const [copied, setCopied] = useState(false);
+  const [copiedUrl, setCopiedUrl] = useState(false);
   const [endpoint, setEndpoint] = useState(null);
 
   useEffect(() => {
@@ -17,19 +18,24 @@ export default function AgentConfigBlock({ token, companyId }) {
 
   const config = `# Configuração do Agente Desktop
 endpoint: "${endpointDisplay}"
-company_id: "${companyId || "SEU_COMPANY_ID"}"
 token: "${token || "SEU_TOKEN_AQUI"}"
 
 # Exemplo de chamada cURL:
 # curl -X POST "${endpointDisplay}" \\
 #   -H "Authorization: Bearer ${token || "SEU_TOKEN"}" \\
-#   -F "companyId=${companyId || "SEU_COMPANY_ID"}" \\
 #   -F "file=@/caminho/para/nota.xml"`;
 
   const handleCopy = () => {
     navigator.clipboard.writeText(config);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
+  };
+
+  const handleCopyUrl = () => {
+    if (!endpoint) return;
+    navigator.clipboard.writeText(endpoint);
+    setCopiedUrl(true);
+    setTimeout(() => setCopiedUrl(false), 2000);
   };
 
   return (
