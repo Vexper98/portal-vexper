@@ -46,8 +46,12 @@ export default function Layout({ children, currentPageName }) {
   useEffect(() => {
     if (!user) return;
     const loadNotifications = async () => {
-      const notifs = await base44.entities.Notification.filter({ destinatario: user.email, lida: false });
-      setUnreadCount(notifs.length);
+      try {
+        const notifs = await base44.entities.Notification.filter({ destinatario: user.email, lida: false });
+        setUnreadCount(notifs.length);
+      } catch (e) {
+        console.error("Erro ao carregar notificações:", e);
+      }
     };
     loadNotifications();
   }, [user, currentPageName]);
