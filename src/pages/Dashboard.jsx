@@ -39,11 +39,28 @@ export default function Dashboard() {
   const weekStart = startOfWeek(now, { weekStartsOn: 1 }).toISOString();
   const monthStart = startOfMonth(now).toISOString();
 
-  const docsToday = documents.filter(d => d.created_date >= todayStart).length;
-  const docsWeek = documents.filter(d => d.created_date >= weekStart).length;
-  const docsMonth = documents.filter(d => d.created_date >= monthStart).length;
-  const docsErro = documents.filter(d => d.status === "erro").length;
+  // Combina FiscalDocuments + Documents do agente para contagens e gráfico
+  const allDocs = [
+    ...documents,
+    ...agentDocs.map(d => ({
+      ...d,
+      created_date: d.createdAt || d.created_date,
+      status: d.status,
+      company_name: companies.find(c => c.id === d.companyId)?.nome_fantasia ||
+                    companies.find(c => c.id === d.companyId)?.razao_social || "",
+      nome_arquivo: d.filename,
+      tipo_documento: "nfe_xml",
+    })),
+  ];
+
+  const docsToday = allDocs.filter(d => (d.created_date || "") >= todayStart).length;
+  const docsWeek = allDocs.filter(d => (d.created_date || "") >= weekStart).length;
+  const docsMonth = allDocs.filter(d => (d.created_date || "") >= monthStart).length;
+  const docsErro = allDocs.filter(d => d.status === "erro").length;
   const activeCompanies = companies.filter(c => c.status === "ativa").length;
+
+  // Empresas únicas que têm documentos do agente
+  const companiesWithAgentDocs = [...new Set(agentDocs.map(d => d.companyId))].length;
 
   const companiesNoSend = companies.filter(c => {
     if (!c.ultimo_envio) return true;
