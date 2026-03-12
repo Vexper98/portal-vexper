@@ -115,6 +115,13 @@ export default function ContadorPanel({ user }) {
 
   return (
     <div className="space-y-8">
+      {/* Back button */}
+      <div>
+        <Button variant="outline" size="sm" className="rounded-xl gap-2" onClick={() => navigate("/Dashboard")}>
+          <ArrowLeft className="w-4 h-4" /> Voltar ao Menu
+        </Button>
+      </div>
+
       {/* Hero Banner */}
       <div className="relative rounded-2xl overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-br from-[#0f1729] via-[#1a2744] to-[#0c2340]" />
