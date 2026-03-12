@@ -12,7 +12,7 @@ export default function CompanyFormDialog({ open, onOpenChange, company, onSave,
   const [form, setForm] = useState(company || {
     razao_social: "", nome_fantasia: "", cnpj: "", inscricao_estadual: "",
     endereco: "", cidade: "", estado: "", cep: "", telefone: "", email: "",
-    contador_responsavel: "", pasta_sincronizacao: "", status: "ativa", observacoes: ""
+    contador_responsavel: "", contadorEmail: "", pasta_sincronizacao: "", status: "ativa", observacoes: ""
   });
 
   const handleChange = (field, value) => setForm(prev => ({ ...prev, [field]: value }));
@@ -76,8 +76,12 @@ export default function CompanyFormDialog({ open, onOpenChange, company, onSave,
               <Input type="email" value={form.email} onChange={e => handleChange("email", e.target.value)} />
             </div>
             <div className="space-y-1.5">
-              <Label>Contador Responsável</Label>
-              <Input value={form.contador_responsavel} onChange={e => handleChange("contador_responsavel", e.target.value)} placeholder="email@contador.com" />
+              <Label>Contador Responsável (nome)</Label>
+              <Input value={form.contador_responsavel} onChange={e => handleChange("contador_responsavel", e.target.value)} placeholder="Nome do contador" />
+            </div>
+            <div className="space-y-1.5">
+              <Label>E-mail do Contador (login vinculado)</Label>
+              <Input type="email" value={form.contadorEmail || ""} onChange={e => handleChange("contadorEmail", e.target.value)} placeholder="contador@escritorio.com" />
             </div>
             <div className="space-y-1.5">
               <Label>Status</Label>

@@ -39,7 +39,17 @@ export default function DocumentUpload() {
   const fileInputRef                    = useRef(null);
 
   useEffect(() => {
-    base44.entities.Company.list("-created_date", 200).then(setCompanies);
+    const fetchCompanies = async () => {
+      const [u, comps] = await Promise.all([
+        base44.auth.me(),
+        base44.entities.Company.list("-created_date", 200),
+      ]);
+      const myCompanies = u?.role === "contador"
+        ? comps.filter(c => c.contadorEmail === u.email || c.contador_responsavel === u.email)
+        : comps;
+      setCompanies(myCompanies);
+    };
+    fetchCompanies();
   }, []);
 
   const handleFileSelect = (e) => {

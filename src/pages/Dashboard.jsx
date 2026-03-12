@@ -19,12 +19,19 @@ export default function Dashboard() {
   const [loading, setLoading] = useState(true);
 
   const load = useCallback(async () => {
-    const [comps, docs] = await Promise.all([
+    const [u, comps, docs] = await Promise.all([
+      base44.auth.me(),
       base44.entities.Company.list("-created_date", 200),
       base44.entities.Document.list("-created_date", 500),
     ]);
-    setCompanies(comps);
-    setDocuments(docs);
+    const restricted = u?.role === "contador";
+    const myCompanies = restricted
+      ? comps.filter(c => c.contadorEmail === u.email || c.contador_responsavel === u.email)
+      : comps;
+    const myIds = new Set(myCompanies.map(c => c.id));
+    const myDocs = restricted ? docs.filter(d => myIds.has(d.companyId)) : docs;
+    setCompanies(myCompanies);
+    setDocuments(myDocs);
     setLoading(false);
   }, []);
 

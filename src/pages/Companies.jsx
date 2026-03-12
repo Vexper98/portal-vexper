@@ -36,8 +36,14 @@ export default function Companies() {
   const [deleteTarget, setDeleteTarget] = useState(null);
 
   const loadCompanies = async () => {
-    const data = await base44.entities.Company.list("-created_date", 200);
-    setCompanies(data);
+    const [u, data] = await Promise.all([
+      base44.auth.me(),
+      base44.entities.Company.list("-created_date", 200),
+    ]);
+    const myCompanies = u?.role === "contador"
+      ? data.filter(c => c.contadorEmail === u.email || c.contador_responsavel === u.email)
+      : data;
+    setCompanies(myCompanies);
     setLoading(false);
   };
 

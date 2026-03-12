@@ -53,7 +53,7 @@ export default function Documents() {
   const [search, setSearch]           = useState("");
   const [statusF, setStatusF]         = useState("all");
   const [typeF, setTypeF]             = useState("all");
-  const [companyF, setCompanyF]       = useState("all");
+  const [companyF, setCompanyF]       = useState(() => new URLSearchParams(window.location.search).get("company_id") || "all");
   const [sourceF, setSourceF]         = useState("all");
   const [dateFrom, setDateFrom]       = useState("");
   const [dateTo, setDateTo]           = useState("");
@@ -65,14 +65,21 @@ export default function Documents() {
   const [copiedKey, setCopiedKey]     = useState(null);
 
   const loadData = async () => {
-    const [docs, comps] = await Promise.all([
+    const [u, docs, comps] = await Promise.all([
+      base44.auth.me(),
       base44.entities.Document.list("-created_date", 500),
       base44.entities.Company.list("-created_date", 200),
     ]);
-    setDocuments(docs);
-    setCompanies(comps);
+    const restricted = u?.role === "contador";
+    const myCompanies = restricted
+      ? comps.filter(c => c.contadorEmail === u.email || c.contador_responsavel === u.email)
+      : comps;
+    const myIds = new Set(myCompanies.map(c => c.id));
+    const myDocs = restricted ? docs.filter(d => myIds.has(d.companyId)) : docs;
+    setDocuments(myDocs);
+    setCompanies(myCompanies);
     const map = {};
-    comps.forEach(c => { map[c.id] = c; });
+    myCompanies.forEach(c => { map[c.id] = c; });
     setCompaniesMap(map);
     setLoading(false);
   };
