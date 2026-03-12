@@ -7,7 +7,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Skeleton } from "@/components/ui/skeleton";
 import { motion, AnimatePresence } from "framer-motion";
-import { Download, FileText, Building2, Search, FileDown, RefreshCw, FileCheck, FileX, Cpu, Database, LayoutDashboard } from "lucide-react";
+import { Download, FileText, Building2, Search, FileDown, RefreshCw, FileCheck, FileX, Cpu, Database, LayoutDashboard, ArrowLeft } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import { format } from "date-fns";
 import JSZip from "jszip";
 
