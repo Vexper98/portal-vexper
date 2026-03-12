@@ -36,13 +36,17 @@ export default function ContadorPanel({ user }) {
 
   const load = async () => {
     setLoading(true);
-    const [comps, docs] = await Promise.all([
-      base44.entities.Company.filter({ contadorEmail: user.email }),
-      base44.entities.Document.list("-created_date", 200),
-    ]);
-    setCompanies(comps);
-    const compIds = new Set(comps.map(c => c.id));
-    setDocuments(docs.filter(d => compIds.has(d.companyId)));
+    try {
+      const [comps, docs] = await Promise.all([
+        base44.entities.Company.filter({ contadorEmail: user.email }),
+        base44.entities.Document.list("-created_date", 200),
+      ]);
+      setCompanies(comps);
+      const compIds = new Set(comps.map(c => c.id));
+      setDocuments(docs.filter(d => compIds.has(d.companyId)));
+    } catch (e) {
+      console.error("Erro ao carregar dados:", e);
+    }
     setLoading(false);
   };
 
