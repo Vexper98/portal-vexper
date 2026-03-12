@@ -52,40 +52,72 @@ Deno.serve(async (req) => {
   let filename = null;
 
   try {
-    // ── 1. Extract token from Authorization header ──────────────────────────
+    // ── 1. Extract token ─────────────────────────────────────────────────────
     const authHeader = req.headers.get("Authorization") || "";
     const token = authHeader.startsWith("Bearer ") ? authHeader.slice(7).trim() : "";
 
-    console.log("[DEBUG] Authorization header bruto:", authHeader.substring(0, 30));
     console.log("[DEBUG] Token recebido (mascarado):", mask(token));
-    console.log("[DEBUG] Token length:", token.length);
 
     if (!token) {
       return Response.json(
-        { success: false, message: "Header Authorization ausente ou inválido. Use: Authorization: Bearer SEU_TOKEN" },
+        { success: false, message: "Header Authorization ausente. Use: Authorization: Bearer SEU_TOKEN" },
         { status: 401, headers: CORS }
       );
     }
 
-    // ── 2. Parse body ────────────────────────────────────────────────────────
+    // ── 2. Resolve companyId from token ──────────────────────────────────────
+    let company = null;
+
+    // Strategy A: SyncToken
+    const allTokens = await base44.asServiceRole.entities.SyncToken.list("-created_date", 500);
+    const matchedSync = allTokens.find(t => t.token === token && t.status === "ativo");
+
+    if (matchedSync) {
+      companyId = matchedSync.company_id;
+      console.log("[DEBUG] Token válido via SyncToken | companyId:", companyId);
+      await base44.asServiceRole.entities.SyncToken.update(matchedSync.id, { ultimo_uso: new Date().toISOString() });
+      const companies = await base44.asServiceRole.entities.Company.list("-created_date", 500);
+      company = companies.find(c => c.id === companyId) || null;
+    }
+
+    // Strategy B: Company.agentToken
+    if (!company) {
+      const allCompanies = await base44.asServiceRole.entities.Company.list("-created_date", 500);
+      const matchedByToken = allCompanies.find(c => c.agentToken === token);
+      if (matchedByToken) {
+        companyId = matchedByToken.id;
+        company = matchedByToken;
+        console.log("[DEBUG] Token válido via Company.agentToken | companyId:", companyId);
+      }
+    }
+
+    if (!company) {
+      console.log("[DEBUG] Token inválido:", mask(token));
+      return Response.json(
+        { success: false, message: "Token inválido. Verifique o token em Agente Sync > Configuração do Agente." },
+        { status: 401, headers: CORS }
+      );
+    }
+
+    if (company.active === false || company.status === "inativa" || company.status === "suspensa") {
+      return Response.json(
+        { success: false, message: "Empresa inativa. Entre em contato com o contador." },
+        { status: 403, headers: CORS }
+      );
+    }
+
+    // ── 3. Parse body ────────────────────────────────────────────────────────
     let xmlContent = null;
     let documentTypeHint = null;
     const contentType = req.headers.get("Content-Type") || "";
 
     if (contentType.includes("multipart/form-data")) {
       const formData = await req.formData();
-      companyId = formData.get("companyId");
       documentTypeHint = formData.get("documentType") || null;
       const fileField = formData.get("file");
 
-      console.log("[DEBUG] companyId recebido (form):", companyId);
-      console.log("[DEBUG] file presente:", !!fileField);
-
-      if (!fileField || !companyId) {
-        return Response.json(
-          { success: false, message: `Campos ausentes: ${!fileField ? "file " : ""}${!companyId ? "companyId" : ""}`.trim() },
-          { status: 400, headers: CORS }
-        );
+      if (!fileField) {
+        return Response.json({ success: false, message: "Campo 'file' ausente no form-data" }, { status: 400, headers: CORS });
       }
       if (fileField.size > 10 * 1024 * 1024) {
         return Response.json({ success: false, message: "Arquivo muito grande. Máximo: 10MB" }, { status: 400, headers: CORS });
@@ -95,16 +127,13 @@ Deno.serve(async (req) => {
 
     } else if (contentType.includes("application/json")) {
       const body = await req.json();
-      companyId = body.companyId;
       filename = body.filename;
       xmlContent = body.xmlContent;
       documentTypeHint = body.documentType || null;
 
-      console.log("[DEBUG] companyId recebido (json):", companyId);
-
-      if (!companyId || !filename || !xmlContent) {
+      if (!filename || !xmlContent) {
         return Response.json(
-          { success: false, message: "Campos obrigatórios ausentes: companyId, filename, xmlContent" },
+          { success: false, message: "Campos obrigatórios ausentes: filename, xmlContent" },
           { status: 400, headers: CORS }
         );
       }
@@ -115,110 +144,20 @@ Deno.serve(async (req) => {
       );
     }
 
-    // ── 3. Validate token — Strategy A: SyncToken entity ────────────────────
-    let company = null;
-    let authStrategy = null;
-
-    try {
-      const allTokens = await base44.asServiceRole.entities.SyncToken.list("-created_date", 500);
-      console.log("[DEBUG] Total SyncTokens no banco:", allTokens.length);
-
-      const matchedSync = allTokens.find(t => t.token === token && t.status === "ativo");
-      if (matchedSync) {
-        console.log("[DEBUG] SyncToken encontrado | company_id esperado:", matchedSync.company_id);
-        console.log("[DEBUG] companyId recebido:", companyId);
-
-        if (matchedSync.company_id !== companyId) {
-          console.log("[DEBUG] FALHA: companyId não bate com o token | esperado:", matchedSync.company_id, "| recebido:", companyId);
-          await saveLog(base44, companyId, filename || "", `Auth falhou: companyId incorreto | esperado: ${matchedSync.company_id} | recebido: ${companyId}`, "error");
-          return Response.json({
-            success: false,
-            message: `companyId incorreto. O token pertence à empresa ID: ${matchedSync.company_id}. Você enviou: ${companyId}`,
-          }, { status: 401, headers: CORS });
-        }
-
-        // Update ultimo_uso
-        await base44.asServiceRole.entities.SyncToken.update(matchedSync.id, { ultimo_uso: new Date().toISOString() });
-
-        // Load company
-        const companies = await base44.asServiceRole.entities.Company.list("-created_date", 500);
-        company = companies.find(c => c.id === companyId) || null;
-        authStrategy = "SyncToken";
-        console.log("[DEBUG] Empresa encontrada via SyncToken:", company?.razao_social);
-      } else {
-        console.log("[DEBUG] Nenhum SyncToken ativo encontrado para este token");
-      }
-    } catch (syncErr) {
-      console.log("[DEBUG] Erro ao buscar SyncToken:", syncErr.message);
-    }
-
-    // ── 4. Validate token — Strategy B: Company.agentToken ──────────────────
-    if (!company) {
-      try {
-        const allCompanies = await base44.asServiceRole.entities.Company.list("-created_date", 500);
-        console.log("[DEBUG] Total empresas no banco:", allCompanies.length);
-
-        const matchedByToken = allCompanies.find(c => c.agentToken === token);
-        if (matchedByToken) {
-          console.log("[DEBUG] Empresa encontrada via agentToken | ID esperado:", matchedByToken.id, "| token esperado (mascarado):", mask(matchedByToken.agentToken));
-          console.log("[DEBUG] companyId recebido:", companyId);
-
-          if (matchedByToken.id !== companyId) {
-            console.log("[DEBUG] FALHA: companyId não bate | esperado:", matchedByToken.id, "| recebido:", companyId);
-            await saveLog(base44, companyId, filename || "", `Auth falhou: companyId incorreto | esperado: ${matchedByToken.id} | recebido: ${companyId}`, "error");
-            return Response.json({
-              success: false,
-              message: `companyId incorreto. O token pertence à empresa ID: ${matchedByToken.id}. Você enviou: ${companyId}`,
-            }, { status: 401, headers: CORS });
-          }
-
-          company = matchedByToken;
-          authStrategy = "Company.agentToken";
-          console.log("[DEBUG] Autenticado via Company.agentToken:", company.razao_social);
-        } else {
-          // Log all agentTokens (masked) for debugging
-          const withTokens = allCompanies.filter(c => c.agentToken);
-          console.log("[DEBUG] Empresas com agentToken:", withTokens.map(c => ({ id: c.id, token: mask(c.agentToken) })));
-          console.log("[DEBUG] FALHA TOTAL: nenhuma empresa encontrada para o token fornecido");
-        }
-      } catch (compErr) {
-        console.log("[DEBUG] Erro ao buscar empresas:", compErr.message);
-      }
-    }
-
-    if (!company) {
-      await saveLog(base44, companyId || "", filename || "", `Auth falhou: token inválido (mascarado: ${mask(token)})`, "error");
-      return Response.json({
-        success: false,
-        message: "Token inválido: nenhuma empresa encontrada para este token. Verifique o token na tela Agente Sync > Configuração do Agente.",
-      }, { status: 401, headers: CORS });
-    }
-
-    console.log("[DEBUG] Autenticação OK via:", authStrategy);
-
-    // ── 5. Check company status ──────────────────────────────────────────────
-    if (company.active === false || company.status === "inativa" || company.status === "suspensa") {
-      await saveLog(base44, companyId, filename || "", "Upload bloqueado: empresa inativa ou suspensa", "warning");
-      return Response.json(
-        { success: false, message: "Empresa inativa. Entre em contato com o contador." },
-        { status: 403, headers: CORS }
-      );
-    }
-
-    // ── 6. Extract XML metadata ──────────────────────────────────────────────
+    // ── 4. Extract XML metadata ──────────────────────────────────────────────
     const documentType = detectType(xmlContent, documentTypeHint);
     const accessKey = extractAccessKey(xmlContent);
     const emitterCnpj = extractCnpj(xmlContent);
 
-    // ── 7. Deduplication ────────────────────────────────────────────────────
+    // ── 5. Deduplication ─────────────────────────────────────────────────────
     if (accessKey) {
-      const allDocs = await base44.asServiceRole.entities.Document.filter({ companyId, accessKey });
-      if (allDocs?.length > 0) {
+      const existing = await base44.asServiceRole.entities.Document.filter({ companyId, accessKey });
+      if (existing?.length > 0) {
         await saveLog(base44, companyId, filename, `Duplicado ignorado | Chave: ${accessKey}`, "warning");
         return Response.json({
           success: false,
-          message: "Documento duplicado: já existe um registro com esta chave de acesso",
-          documentId: allDocs[0].id,
+          message: "Documento duplicado: chave de acesso já registrada",
+          documentId: existing[0].id,
           duplicate: true,
         }, { status: 409, headers: CORS });
       }
@@ -228,19 +167,17 @@ Deno.serve(async (req) => {
       if (existing?.length > 0 && existing.some(d => d.contentHash === contentHash)) {
         return Response.json({
           success: false,
-          message: "Documento duplicado: mesmo arquivo já enviado anteriormente",
+          message: "Documento duplicado: mesmo arquivo já enviado",
           duplicate: true,
         }, { status: 409, headers: CORS });
       }
     }
 
-    // ── 8. Upload to storage ─────────────────────────────────────────────────
+    // ── 6. Upload to storage ─────────────────────────────────────────────────
     const fileBlob = new Blob([xmlContent], { type: "text/xml" });
     const uploadResult = await base44.asServiceRole.integrations.Core.UploadFile({ file: fileBlob });
-    const fileUrl = uploadResult.file_url;
-
-    const now = new Date().toISOString();
     const contentHash = accessKey ? null : await sha256(xmlContent);
+    const now = new Date().toISOString();
 
     const document = await base44.asServiceRole.entities.Document.create({
       companyId,
@@ -248,7 +185,7 @@ Deno.serve(async (req) => {
       originalFilename: filename,
       documentType,
       xmlContent,
-      fileUrl,
+      fileUrl: uploadResult.file_url,
       accessKey: accessKey || null,
       emitterCnpj: emitterCnpj || null,
       contentHash: contentHash || null,
@@ -273,7 +210,7 @@ Deno.serve(async (req) => {
     }, { headers: CORS });
 
   } catch (error) {
-    console.log("[DEBUG] Erro não tratado:", error.message, error.stack);
+    console.log("[DEBUG] Erro:", error.message);
     await saveLog(base44, companyId || "", filename || "unknown", `Erro interno: ${error.message}`, "error");
     return Response.json(
       { success: false, message: `Erro interno: ${error.message}` },
