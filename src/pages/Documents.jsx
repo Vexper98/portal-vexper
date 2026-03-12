@@ -26,6 +26,7 @@ import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { Skeleton } from "@/components/ui/skeleton";
 import XmlViewerModal from "../components/documents/XmlViewerModal";
+import JSZip from "jszip";
 
 const STATUS = {
   recebido:  { label: "Recebido",   cls: "bg-blue-50 text-blue-700 border-blue-200" },
@@ -61,7 +62,7 @@ export default function Documents() {
   const [selected, setSelected]       = useState(new Set());
   const [viewerDoc, setViewerDoc]     = useState(null);
   const [deleteTarget, setDeleteTarget] = useState(null);
-  
+  const [zipping, setZipping]         = useState(false);
   const [copiedKey, setCopiedKey]     = useState(null);
 
   const loadData = async () => {
@@ -104,23 +105,24 @@ export default function Documents() {
     URL.revokeObjectURL(blobUrl);
   };
 
-  const handleBulkDownload = () => {
+  const handleBulkDownload = async () => {
     if (selected.size === 0) return;
+    setZipping(true);
+    const zip = new JSZip();
     const selectedDocs = documents.filter(d => selected.has(d.id));
-    selectedDocs.forEach((doc, i) => {
-      setTimeout(() => {
-        const content = doc.xmlContent || "";
-        const blob = new Blob([content], { type: "text/xml" });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement("a");
-        a.href = doc.fileUrl || url;
-        a.download = doc.filename || `${doc.id}.xml`;
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        URL.revokeObjectURL(url);
-      }, i * 300);
+    selectedDocs.forEach(doc => {
+      zip.file(doc.filename || `${doc.id}.xml`, doc.xmlContent || "");
     });
+    const blob = await zip.generateAsync({ type: "blob" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `documentos-${new Date().toISOString().slice(0, 10)}.zip`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    setZipping(false);
   };
 
   const copyKey = (key, id) => {
