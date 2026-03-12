@@ -148,6 +148,9 @@ export default function Settings() {
   const [inviteRole, setInviteRole] = useState("empresa");
   const [inviting, setInviting] = useState(false);
   const [currentUser, setCurrentUser] = useState(null);
+  const [editRoleUser, setEditRoleUser] = useState(null);
+  const [editRoleValue, setEditRoleValue] = useState("");
+  const [savingRole, setSavingRole] = useState(false);
 
   useEffect(() => {
     const load = async () => {
