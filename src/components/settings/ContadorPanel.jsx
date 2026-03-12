@@ -66,56 +66,68 @@ export default function ContadorPanel({ user }) {
   const toggleSelect = (id) => setSelected(prev => prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id]);
   const toggleAll = () => setSelected(selected.length === filtered.length ? [] : filtered.map(d => d.id));
 
-  const downloadDoc = (doc) => {
-    if (doc.xmlContent) {
-      const blob = new Blob([doc.xmlContent], { type: "application/xml" });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = doc.originalFilename || doc.filename || "documento.xml";
-      a.click();
-      URL.revokeObjectURL(url);
-    } else if (doc.fileUrl) {
-      window.open(doc.fileUrl, "_blank");
+  const downloadDoc = async (doc) => {
+    try {
+      const res = await base44.functions.invoke('getDocumentsForDownload', { documentIds: [doc.id] });
+      const fullDoc = res.data.documents[0];
+      
+      if (fullDoc?.xmlContent) {
+        const blob = new Blob([fullDoc.xmlContent], { type: "application/xml" });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = fullDoc.filename || "documento.xml";
+        a.click();
+        URL.revokeObjectURL(url);
+      } else {
+        alert("Arquivo não contém conteúdo disponível para download");
+      }
+    } catch (e) {
+      console.error("Erro ao baixar:", e);
+      alert("Erro ao baixar arquivo");
     }
   };
 
   const downloadSelected = async () => {
-    const docs = documents.filter(d => selected.includes(d.id));
-    if (docs.length === 1) { downloadDoc(docs[0]); return; }
-    const zip = new JSZip();
-    let added = 0;
-    for (const doc of docs) {
-      const filename = doc.originalFilename || doc.filename || `${doc.id}.xml`;
-      if (doc.xmlContent) {
-        zip.file(filename, doc.xmlContent);
-        added++;
-      } else if (doc.fileUrl) {
-        try {
-          const resp = await fetch(doc.fileUrl);
-          if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
-          const arrayBuf = await resp.arrayBuffer();
-          if (arrayBuf.byteLength > 0) {
-            zip.file(filename, arrayBuf);
-            added++;
-          }
-        } catch (e) {
-          console.warn("Erro ao baixar arquivo:", filename, e);
+    const docsToDownload = documents.filter(d => selected.includes(d.id));
+    if (docsToDownload.length === 1) { 
+      await downloadDoc(docsToDownload[0]); 
+      return; 
+    }
+    
+    try {
+      const res = await base44.functions.invoke('getDocumentsForDownload', { 
+        documentIds: docsToDownload.map(d => d.id) 
+      });
+      
+      const fullDocs = res.data.documents;
+      const zip = new JSZip();
+      let added = 0;
+      
+      for (const doc of fullDocs) {
+        if (doc.xmlContent) {
+          zip.file(doc.filename || `${doc.id}.xml`, doc.xmlContent);
+          added++;
         }
       }
+      
+      if (added === 0) {
+        alert("Nenhum arquivo pôde ser incluído no ZIP.");
+        return;
+      }
+      
+      const blob = await zip.generateAsync({ type: "blob" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "documentos.zip";
+      a.click();
+      URL.revokeObjectURL(url);
+      setSelected([]);
+    } catch (e) {
+      console.error("Erro ao baixar arquivos:", e);
+      alert("Erro ao baixar arquivos");
     }
-    if (added === 0) {
-      alert("Nenhum arquivo pôde ser incluído no ZIP. Os arquivos podem não ter conteúdo disponível.");
-      return;
-    }
-    const blob = await zip.generateAsync({ type: "blob" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = "documentos.zip";
-    a.click();
-    URL.revokeObjectURL(url);
-    setSelected([]);
   };
 
   if (loading) return (
