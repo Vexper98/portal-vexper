@@ -185,8 +185,6 @@ Deno.serve(async (req) => {
         filename,
         originalFilename: filename,
         documentType,
-        xmlContent,
-        fileUrl: null,
         accessKey: accessKey || null,
         emitterCnpj: emitterCnpj || null,
         contentHash: contentHash || null,
