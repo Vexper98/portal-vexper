@@ -41,12 +41,23 @@ token: "${token || "SEU_TOKEN_AQUI"}"
   return (
     <div className="space-y-3">
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
-        <div className="p-3 rounded-lg bg-slate-50 space-y-1.5 sm:col-span-2">
-          <p className="text-slate-400 font-medium uppercase tracking-wide text-[10px]">Endpoint Upload (URL real da API)</p>
+        <div className="p-3 rounded-lg bg-slate-50 space-y-2 sm:col-span-2">
+          <div className="flex items-center justify-between gap-2">
+            <p className="text-slate-400 font-medium uppercase tracking-wide text-[10px]">Endpoint Upload (URL pública da API)</p>
+            <Button
+              size="sm"
+              variant="outline"
+              className="h-7 text-xs shrink-0"
+              onClick={handleCopyUrl}
+              disabled={!endpoint}
+            >
+              {copiedUrl ? <><CheckCircle2 className="w-3.5 h-3.5 mr-1 text-green-500" /> Copiado!</> : <><Copy className="w-3.5 h-3.5 mr-1" /> Copiar URL do Endpoint</>}
+            </Button>
+          </div>
           {endpoint ? (
-            <p className="font-mono text-slate-700 break-all">{endpoint}</p>
+            <p className="font-mono text-slate-700 break-all text-xs bg-white border border-slate-200 rounded-md px-3 py-2">{endpoint}</p>
           ) : (
-            <span className="flex items-center gap-1 text-slate-400">
+            <span className="flex items-center gap-1 text-slate-400 text-xs">
               <Loader2 className="w-3 h-3 animate-spin" /> Carregando URL...
             </span>
           )}
