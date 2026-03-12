@@ -154,11 +154,19 @@ export default function Settings() {
 
   useEffect(() => {
     const load = async () => {
-      const me = await base44.auth.me();
-      setCurrentUser(me);
-      if (me?.role === "admin") {
-        const u = await base44.entities.User.list("-created_date", 100);
-        setUsers(u);
+      try {
+        const me = await base44.auth.me();
+        setCurrentUser(me);
+        if (me?.role === "admin") {
+          try {
+            const u = await base44.entities.User.list("-created_date", 100);
+            setUsers(u);
+          } catch (e) {
+            console.error("Erro ao listar usuários:", e);
+          }
+        }
+      } catch (e) {
+        console.error("Erro ao carregar usuário:", e);
       }
       setLoading(false);
     };
