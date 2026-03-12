@@ -298,7 +298,36 @@ export default function SyncAgent() {
               </div>
 
               {selectedConfig ? (
-                <AgentConfigBlock token={selectedConfig.token} companyId={selectedConfig.companyId} />
+                selectedConfig.token ? (
+                  <AgentConfigBlock token={selectedConfig.token} companyId={selectedConfig.companyId} />
+                ) : (
+                  <div className="text-center py-10 space-y-3">
+                    <p className="text-sm text-slate-500">Esta empresa não possui token ativo.</p>
+                    <Button
+                      className="bg-blue-600 hover:bg-blue-700"
+                      disabled={saving}
+                      onClick={async () => {
+                        setSaving(true);
+                        const token = generateToken();
+                        const company = companies.find(c => c.id === selectedConfig.companyId);
+                        await base44.entities.SyncToken.create({
+                          company_id: selectedConfig.companyId,
+                          company_name: company?.nome_fantasia || company?.razao_social || "",
+                          company_cnpj: company?.cnpj || "",
+                          token,
+                          descricao: "Token gerado automaticamente",
+                          status: "ativo",
+                        });
+                        await base44.entities.Company.update(selectedConfig.companyId, { agentToken: token, active: true });
+                        setSelectedConfig({ ...selectedConfig, token });
+                        setSaving(false);
+                        loadData();
+                      }}
+                    >
+                      <Plus className="w-4 h-4 mr-2" /> {saving ? "Gerando..." : "Gerar Token Agora"}
+                    </Button>
+                  </div>
+                )
               ) : (
                 <div className="text-center py-10 text-slate-400 text-sm">
                   Selecione uma empresa acima para ver a configuração
