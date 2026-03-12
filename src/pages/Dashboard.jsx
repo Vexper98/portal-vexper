@@ -103,7 +103,7 @@ export default function Dashboard() {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <ActivityChart documents={documents} />
+            <ActivityChart documents={allDocs} />
           </CardContent>
         </Card>
 
@@ -129,7 +129,7 @@ export default function Dashboard() {
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <RecentDocumentsTable documents={documents.slice(0, 10)} />
+          <RecentDocumentsTable documents={allDocs.slice(0, 10)} />
         </CardContent>
       </Card>
     </div>
