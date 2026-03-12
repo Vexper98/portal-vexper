@@ -30,6 +30,7 @@ export default function Dashboard() {
       : comps;
     const myIds = new Set(myCompanies.map(c => c.id));
     const myDocs = restricted ? docs.filter(d => myIds.has(d.companyId)) : docs;
+    console.log("[Dashboard] Loaded:", { totalDocs: docs.length, filteredDocs: myDocs.length, restricted, userRole: u?.role });
     setCompanies(myCompanies);
     setDocuments(myDocs);
     setLoading(false);
