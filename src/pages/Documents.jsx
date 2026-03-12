@@ -104,25 +104,23 @@ export default function Documents() {
     URL.revokeObjectURL(blobUrl);
   };
 
-  const handleBulkDownload = async () => {
+  const handleBulkDownload = () => {
     if (selected.size === 0) return;
-    setZipping(true);
-    const JSZip = (await import("jszip")).default;
-    const zip = new JSZip();
     const selectedDocs = documents.filter(d => selected.has(d.id));
-    selectedDocs.forEach(doc => {
-      zip.file(doc.filename || `${doc.id}.xml`, doc.xmlContent || "");
+    selectedDocs.forEach((doc, i) => {
+      setTimeout(() => {
+        const content = doc.xmlContent || "";
+        const blob = new Blob([content], { type: "text/xml" });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = doc.fileUrl || url;
+        a.download = doc.filename || `${doc.id}.xml`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+      }, i * 300);
     });
-    const blob = await zip.generateAsync({ type: "blob" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = `documentos-${new Date().toISOString().slice(0, 10)}.zip`;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
-    setZipping(false);
   };
 
   const copyKey = (key, id) => {
