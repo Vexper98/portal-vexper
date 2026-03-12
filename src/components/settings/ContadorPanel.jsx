@@ -336,8 +336,8 @@ export default function ContadorPanel({ user }) {
                         </TableCell>
                         <TableCell>
                           <span className="text-xs text-slate-500">
-                            {doc.created_date ? format(new Date(doc.created_date), "dd/MM/yyyy HH:mm") : "—"}
-                          </span>
+                                            {doc.created_date ? (() => { try { return format(new Date(doc.created_date), "dd/MM/yyyy HH:mm"); } catch { return "—"; } })() : "—"}
+                                          </span>
                         </TableCell>
                         <TableCell>
                           <span className="text-xs font-mono text-slate-400">
