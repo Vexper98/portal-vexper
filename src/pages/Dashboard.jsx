@@ -1,71 +1,71 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { base44 } from "@/api/base44Client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Building2, FileText, AlertTriangle, CheckCircle2, Clock, TrendingUp } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import {
+  Building2, FileText, AlertTriangle, Clock, TrendingUp, Zap, RefreshCw
+} from "lucide-react";
 import StatCard from "../components/dashboard/StatCard";
 import RecentDocumentsTable from "../components/dashboard/RecentDocumentsTable";
 import CompanyStatusList from "../components/dashboard/CompanyStatusList";
 import ActivityChart from "../components/dashboard/ActivityChart";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Button } from "@/components/ui/button";
 import { startOfDay, startOfWeek, startOfMonth } from "date-fns";
 
 export default function Dashboard() {
   const [companies, setCompanies] = useState([]);
   const [documents, setDocuments] = useState([]);
-  const [agentDocs, setAgentDocs] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  const load = async () => {
-    const [comps, docs, aDocs] = await Promise.all([
-      base44.entities.Company.list("-created_date", 100),
-      base44.entities.FiscalDocument.list("-created_date", 200),
-      base44.entities.Document.list("-created_date", 200),
+  const load = useCallback(async () => {
+    const [comps, docs] = await Promise.all([
+      base44.entities.Company.list("-created_date", 200),
+      base44.entities.Document.list("-created_date", 500),
     ]);
     setCompanies(comps);
     setDocuments(docs);
-    setAgentDocs(aDocs);
     setLoading(false);
-  };
+  }, []);
 
   useEffect(() => {
     load();
-    // Auto-refresh a cada 30s para refletir novos envios do agente
     const interval = setInterval(load, 30000);
     return () => clearInterval(interval);
-  }, []);
+  }, [load]);
 
-  const now = new Date();
+  const now        = new Date();
   const todayStart = startOfDay(now).toISOString();
-  const weekStart = startOfWeek(now, { weekStartsOn: 1 }).toISOString();
+  const weekStart  = startOfWeek(now, { weekStartsOn: 1 }).toISOString();
   const monthStart = startOfMonth(now).toISOString();
 
-  // Combina FiscalDocuments + Documents do agente para contagens e gráfico
-  const allDocs = [
-    ...documents,
-    ...agentDocs.map(d => ({
-      ...d,
-      created_date: d.createdAt || d.created_date,
-      status: d.status,
-      company_name: companies.find(c => c.id === d.companyId)?.nome_fantasia ||
-                    companies.find(c => c.id === d.companyId)?.razao_social || "",
-      nome_arquivo: d.filename,
-      tipo_documento: "nfe_xml",
-    })),
-  ];
+  const docsToday  = documents.filter(d => (d.uploadedAt || d.created_date || "") >= todayStart).length;
+  const docsWeek   = documents.filter(d => (d.uploadedAt || d.created_date || "") >= weekStart).length;
+  const docsMonth  = documents.filter(d => (d.uploadedAt || d.created_date || "") >= monthStart).length;
+  const docsErro   = documents.filter(d => d.status === "erro").length;
+  const agentDocs  = documents.filter(d => d.source === "agent").length;
 
-  const docsToday = allDocs.filter(d => (d.created_date || "") >= todayStart).length;
-  const docsWeek = allDocs.filter(d => (d.created_date || "") >= weekStart).length;
-  const docsMonth = allDocs.filter(d => (d.created_date || "") >= monthStart).length;
-  const docsErro = allDocs.filter(d => d.status === "erro").length;
-  const activeCompanies = companies.filter(c => c.status === "ativa").length;
-
-  // Empresas únicas que têm documentos do agente
-  const companiesWithAgentDocs = [...new Set(agentDocs.map(d => d.companyId))].length;
+  const activeCompanies = companies.filter(c => c.active !== false && c.status !== "inativa").length;
 
   const companiesNoSend = companies.filter(c => {
-    if (!c.ultimo_envio) return true;
-    return (Date.now() - new Date(c.ultimo_envio).getTime()) > 7 * 86400000;
+    const last = c.lastSyncAt || c.ultimo_envio;
+    if (!last) return true;
+    return (Date.now() - new Date(last).getTime()) > 7 * 86400000;
   });
+
+  // Enrich docs with company names for table
+  const companyMap = {};
+  companies.forEach(c => { companyMap[c.id] = c; });
+  const enrichedDocs = documents.map(d => ({
+    ...d,
+    company_name: companyMap[d.companyId]?.nome_fantasia || companyMap[d.companyId]?.razao_social || "",
+    nome_arquivo: d.filename,
+    tipo_documento: d.documentType === "NFe" ? "nfe_xml" : d.documentType === "NFCe" ? "nfce_xml" : "outros",
+    created_date: d.uploadedAt || d.created_date,
+  }));
+
+  // Chart data - last 14 days
+  const chartDocs = enrichedDocs;
 
   if (loading) {
     return (
@@ -80,20 +80,66 @@ export default function Dashboard() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold text-slate-900">Dashboard</h1>
-        <p className="text-sm text-slate-500 mt-1">Visão geral do escritório</p>
+      {/* Header */}
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-2xl font-bold text-slate-900">Dashboard</h1>
+          <p className="text-sm text-slate-500 mt-1">Visão geral do escritório</p>
+        </div>
+        <Button variant="outline" size="sm" onClick={load}>
+          <RefreshCw className="w-4 h-4 mr-1" /> Atualizar
+        </Button>
       </div>
 
       {/* Stats */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <StatCard title="Empresas Ativas" value={activeCompanies} icon={Building2} color="blue" subtitle={`${companies.length} total`} />
-        <StatCard title="Docs Hoje" value={docsToday} icon={FileText} color="green" subtitle={`${docsWeek} na semana · ${docsMonth} no mês`} />
-        <StatCard title="Via Agente" value={agentDocs.length} icon={CheckCircle2} color="cyan" subtitle={`${companiesWithAgentDocs} empresa(s)`} />
-        <StatCard title="Sem Envio (7d+)" value={companiesNoSend.length} icon={Clock} color="orange" subtitle="Empresas paradas" />
+        <StatCard
+          title="Empresas Ativas"
+          value={activeCompanies}
+          icon={Building2}
+          color="blue"
+          subtitle={`${companies.length} cadastradas`}
+        />
+        <StatCard
+          title="Docs Hoje"
+          value={docsToday}
+          icon={FileText}
+          color="green"
+          subtitle={`${docsWeek} esta semana · ${docsMonth} no mês`}
+        />
+        <StatCard
+          title="Via Agente"
+          value={agentDocs}
+          icon={Zap}
+          color="purple"
+          subtitle={`${documents.length - agentDocs} manual(is)`}
+        />
+        <StatCard
+          title="Erros / Sem Envio"
+          value={docsErro}
+          icon={AlertTriangle}
+          color="red"
+          subtitle={`${companiesNoSend.length} empresa(s) sem sincronização`}
+        />
       </div>
 
-      {/* Charts & Activity */}
+      {/* Alert for companies without sync */}
+      {companiesNoSend.length > 0 && (
+        <div className="flex items-center gap-3 p-4 rounded-xl bg-amber-50 border border-amber-200">
+          <Clock className="w-5 h-5 text-amber-500 shrink-0" />
+          <div>
+            <p className="text-sm font-semibold text-amber-800">
+              {companiesNoSend.length} empresa(s) sem sincronização há mais de 7 dias
+            </p>
+            <p className="text-xs text-amber-600 mt-0.5">
+              {companiesNoSend.slice(0, 3).map(c => c.nome_fantasia || c.razao_social).join(", ")}
+              {companiesNoSend.length > 3 && ` e mais ${companiesNoSend.length - 3}...`}
+            </p>
+          </div>
+        </div>
+      )}
+
+      {/* Charts */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <Card className="lg:col-span-2 border-0 shadow-sm">
           <CardHeader className="pb-2">
@@ -103,7 +149,7 @@ export default function Dashboard() {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <ActivityChart documents={allDocs} />
+            <ActivityChart documents={chartDocs} />
           </CardContent>
         </Card>
 
@@ -123,13 +169,25 @@ export default function Dashboard() {
       {/* Recent Documents */}
       <Card className="border-0 shadow-sm">
         <CardHeader className="pb-2">
-          <CardTitle className="text-base font-semibold flex items-center gap-2">
-            <FileText className="w-4 h-4 text-blue-500" />
-            Últimos Documentos Recebidos
-          </CardTitle>
+          <div className="flex items-center justify-between">
+            <CardTitle className="text-base font-semibold flex items-center gap-2">
+              <FileText className="w-4 h-4 text-blue-500" />
+              Últimos Documentos Recebidos
+            </CardTitle>
+            <div className="flex gap-1">
+              {["NFe","NFCe","XML"].map(t => {
+                const count = documents.filter(d => d.documentType === t).length;
+                return count > 0 ? (
+                  <Badge key={t} variant="secondary" className="text-[10px]">
+                    {t}: {count}
+                  </Badge>
+                ) : null;
+              })}
+            </div>
+          </div>
         </CardHeader>
         <CardContent>
-          <RecentDocumentsTable documents={allDocs.slice(0, 10)} />
+          <RecentDocumentsTable documents={enrichedDocs.slice(0, 10)} />
         </CardContent>
       </Card>
     </div>
