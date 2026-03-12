@@ -30,10 +30,16 @@ export default function Settings() {
   const [inviteRole, setInviteRole] = useState("empresa");
   const [inviting, setInviting] = useState(false);
 
+  const [currentUser, setCurrentUser] = useState(null);
+
   useEffect(() => {
     const load = async () => {
-      const u = await base44.entities.User.list("-created_date", 100);
-      setUsers(u);
+      const me = await base44.auth.me();
+      setCurrentUser(me);
+      if (me?.role === "admin") {
+        const u = await base44.entities.User.list("-created_date", 100);
+        setUsers(u);
+      }
       setLoading(false);
     };
     load();
