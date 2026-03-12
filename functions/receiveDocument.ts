@@ -173,28 +173,40 @@ Deno.serve(async (req) => {
       }
     }
 
-    // ── 6. Upload to storage ─────────────────────────────────────────────────
-    const fileBlob = new Blob([xmlContent], { type: "text/xml" });
-    const uploadResult = await base44.asServiceRole.integrations.Core.UploadFile({ file: fileBlob });
+    // ── 6. Save document ─────────────────────────────────────────────────────
     const contentHash = accessKey ? null : await sha256(xmlContent);
     const now = new Date().toISOString();
 
-    const document = await base44.asServiceRole.entities.Document.create({
-      companyId,
-      filename,
-      originalFilename: filename,
-      documentType,
-      xmlContent,
-      fileUrl: uploadResult.file_url,
-      accessKey: accessKey || null,
-      emitterCnpj: emitterCnpj || null,
-      contentHash: contentHash || null,
-      status: "recebido",
-      source: "agent",
-      uploadedAt: now,
-    });
+    console.log("[DEBUG] Criando registro em Document...");
+    let document;
+    try {
+      document = await base44.asServiceRole.entities.Document.create({
+        companyId,
+        filename,
+        originalFilename: filename,
+        documentType,
+        xmlContent,
+        fileUrl: null,
+        accessKey: accessKey || null,
+        emitterCnpj: emitterCnpj || null,
+        contentHash: contentHash || null,
+        status: "recebido",
+        source: "agent",
+        uploadedAt: now,
+      });
+      console.log("[DEBUG] Document criado:", document.id);
+    } catch (err) {
+      console.log("[DEBUG] Erro ao criar Document:", err.message);
+      return Response.json({ success: false, message: `Erro ao criar registro em Document: ${err.message}` }, { status: 500, headers: CORS });
+    }
 
-    await base44.asServiceRole.entities.Company.update(companyId, { lastSyncAt: now, ultimo_envio: now });
+    try {
+      await base44.asServiceRole.entities.Company.update(companyId, { lastSyncAt: now, ultimo_envio: now });
+      console.log("[DEBUG] Company.lastSyncAt atualizado");
+    } catch (err) {
+      console.log("[DEBUG] Erro ao atualizar Company:", err.message);
+      // não falhar por isso
+    }
 
     await saveLog(base44, companyId, filename,
       `Documento recebido | Tipo: ${documentType} | Chave: ${accessKey || "N/A"} | CNPJ: ${emitterCnpj || "N/A"}`,
