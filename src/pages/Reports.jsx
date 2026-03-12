@@ -24,12 +24,19 @@ export default function Reports() {
 
   useEffect(() => {
     const load = async () => {
-      const [docs, comps] = await Promise.all([
+      const [u, docs, comps] = await Promise.all([
+        base44.auth.me(),
         base44.entities.FiscalDocument.list("-created_date", 1000),
         base44.entities.Company.list("-created_date", 200),
       ]);
-      setDocuments(docs);
-      setCompanies(comps);
+      const isContador = u?.role === "contador";
+      const myCompanies = isContador
+        ? comps.filter(c => c.contadorEmail === u.email || c.contador_responsavel === u.email)
+        : comps;
+      const myIds = new Set(myCompanies.map(c => c.id));
+      const myDocs = isContador ? docs.filter(d => myIds.has(d.company_id)) : docs;
+      setDocuments(myDocs);
+      setCompanies(myCompanies);
       setLoading(false);
     };
     load();
