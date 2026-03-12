@@ -58,6 +58,21 @@ export default function Settings() {
 
   if (loading) return <div className="space-y-4">{[1,2,3].map(i => <Skeleton key={i} className="h-16 rounded-xl" />)}</div>;
 
+  if (currentUser?.role !== "admin") {
+    return (
+      <div className="space-y-6">
+        <div>
+          <h1 className="text-2xl font-bold text-slate-900">Configurações</h1>
+          <p className="text-sm text-slate-500 mt-1">Informações da sua conta</p>
+        </div>
+        <div className="p-6 rounded-xl bg-slate-50 border border-slate-200 text-slate-500 text-sm">
+          <Shield className="w-8 h-8 mx-auto mb-2 opacity-40" />
+          <p className="text-center">Apenas administradores podem gerenciar usuários e configurações do sistema.</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-6">
       <div>
