@@ -107,6 +107,10 @@ function AdminPanel({ users, onInvite, onEditRole }) {
                 <Badge variant="outline" className={`text-[10px] font-semibold ${roleBadge[u.role] || ""}`}>
                   {roleIcon[u.role]} {roleLabel[u.role] || u.role}
                 </Badge>
+                <Button size="icon" variant="ghost" className="h-7 w-7 opacity-0 group-hover:opacity-100 transition-opacity"
+                  onClick={() => onEditRole(u)}>
+                  <Pencil className="w-3.5 h-3.5 text-slate-400" />
+                </Button>
               </motion.div>
             ))}
           </AnimatePresence>
