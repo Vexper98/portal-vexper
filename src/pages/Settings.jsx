@@ -161,7 +161,7 @@ export default function Settings() {
   const handleInvite = async () => {
     if (!inviteEmail) return;
     setInviting(true);
-    await base44.users.inviteUser(inviteEmail, inviteRole === "admin" ? "admin" : "user");
+    await base44.users.inviteUser(inviteEmail, inviteRole);
     toast.success(`Convite enviado para ${inviteEmail}`);
     setInviteEmail("");
     setInviting(false);
