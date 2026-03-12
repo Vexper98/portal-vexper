@@ -243,6 +243,43 @@ export default function Settings() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+      <Dialog open={!!editRoleUser} onOpenChange={(o) => !o && setEditRoleUser(null)}>
+        <DialogContent className="border-0 shadow-2xl max-w-sm">
+          <DialogHeader>
+            <div className="flex items-center gap-3 mb-1">
+              <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-violet-600 to-purple-500 flex items-center justify-center">
+                <Pencil className="w-4 h-4 text-white" />
+              </div>
+              <DialogTitle className="text-lg font-bold">Alterar Perfil</DialogTitle>
+            </div>
+          </DialogHeader>
+          <div className="py-2 space-y-3">
+            <p className="text-sm text-slate-600">
+              Usuário: <strong>{editRoleUser?.full_name || editRoleUser?.email}</strong>
+            </p>
+            <div className="space-y-1.5">
+              <Label className="text-xs font-semibold text-slate-600 uppercase tracking-wide">Novo Perfil</Label>
+              <Select value={editRoleValue} onValueChange={setEditRoleValue}>
+                <SelectTrigger className="rounded-xl border-slate-200"><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="admin">🔴 Administrador</SelectItem>
+                  <SelectItem value="contador">🔵 Contador</SelectItem>
+                  <SelectItem value="empresa">🟢 Empresa</SelectItem>
+                  <SelectItem value="suporte">🟣 Suporte</SelectItem>
+                  <SelectItem value="user">⚪ Usuário (padrão)</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+          <DialogFooter className="gap-2">
+            <Button variant="outline" onClick={() => setEditRoleUser(null)} className="rounded-xl">Cancelar</Button>
+            <Button onClick={handleEditRole} disabled={savingRole}
+              className="bg-gradient-to-r from-violet-600 to-purple-600 text-white border-0 hover:opacity-90 rounded-xl">
+              {savingRole ? "Salvando..." : <><CheckCircle className="w-4 h-4 mr-1.5" /> Salvar</>}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </>
   );
 }
