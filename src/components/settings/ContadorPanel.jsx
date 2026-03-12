@@ -81,8 +81,18 @@ export default function ContadorPanel({ user }) {
     if (docs.length === 1) { downloadDoc(docs[0]); return; }
     const zip = new JSZip();
     for (const doc of docs) {
-      const content = doc.xmlContent || "";
-      if (content) zip.file(doc.originalFilename || doc.filename || `${doc.id}.xml`, content);
+      const filename = doc.originalFilename || doc.filename || `${doc.id}.xml`;
+      if (doc.xmlContent) {
+        zip.file(filename, doc.xmlContent);
+      } else if (doc.fileUrl) {
+        try {
+          const resp = await fetch(doc.fileUrl);
+          const arrayBuf = await resp.arrayBuffer();
+          zip.file(filename, arrayBuf);
+        } catch (e) {
+          console.warn("Erro ao baixar arquivo:", filename, e);
+        }
+      }
     }
     const blob = await zip.generateAsync({ type: "blob" });
     const url = URL.createObjectURL(blob);
