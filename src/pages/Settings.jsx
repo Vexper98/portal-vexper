@@ -64,12 +64,20 @@ export default function Settings() {
       <div className="space-y-6">
         <div>
           <h1 className="text-2xl font-bold text-slate-900">Configurações</h1>
-          <p className="text-sm text-slate-500 mt-1">Informações da sua conta</p>
+          <p className="text-sm text-slate-500 mt-1">Downloads e informações</p>
         </div>
-        <div className="p-6 rounded-xl bg-slate-50 border border-slate-200 text-slate-500 text-sm">
-          <Shield className="w-8 h-8 mx-auto mb-2 opacity-40" />
-          <p className="text-center">Apenas administradores podem gerenciar usuários e configurações do sistema.</p>
-        </div>
+        <Card className="border-0 shadow-sm">
+          <CardHeader className="pb-2">
+            <CardTitle className="text-base font-semibold flex items-center gap-2">
+              <Download className="w-4 h-4 text-blue-600" />
+              Download do Agente de Sincronização
+            </CardTitle>
+            <p className="text-sm text-slate-500">Instale o agente no computador do cliente para sincronização automática de XMLs.</p>
+          </CardHeader>
+          <CardContent>
+            <DownloadAgentCard />
+          </CardContent>
+        </Card>
       </div>
     );
   }
