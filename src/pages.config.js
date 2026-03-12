@@ -55,6 +55,7 @@ import DocumentUpload from './pages/DocumentUpload';
 import Notifications from './pages/Notifications';
 import Reports from './pages/Reports';
 import Settings from './pages/Settings';
+import SyncAgent from './pages/SyncAgent';
 import __Layout from './Layout.jsx';
 
 
@@ -67,6 +68,7 @@ export const PAGES = {
     "Notifications": Notifications,
     "Reports": Reports,
     "Settings": Settings,
+    "SyncAgent": SyncAgent,
 }
 
 export const pagesConfig = {
