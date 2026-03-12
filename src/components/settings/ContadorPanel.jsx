@@ -84,19 +84,29 @@ export default function ContadorPanel({ user }) {
     const docs = documents.filter(d => selected.includes(d.id));
     if (docs.length === 1) { downloadDoc(docs[0]); return; }
     const zip = new JSZip();
+    let added = 0;
     for (const doc of docs) {
       const filename = doc.originalFilename || doc.filename || `${doc.id}.xml`;
       if (doc.xmlContent) {
         zip.file(filename, doc.xmlContent);
+        added++;
       } else if (doc.fileUrl) {
         try {
           const resp = await fetch(doc.fileUrl);
+          if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
           const arrayBuf = await resp.arrayBuffer();
-          zip.file(filename, arrayBuf);
+          if (arrayBuf.byteLength > 0) {
+            zip.file(filename, arrayBuf);
+            added++;
+          }
         } catch (e) {
           console.warn("Erro ao baixar arquivo:", filename, e);
         }
       }
+    }
+    if (added === 0) {
+      alert("Nenhum arquivo pôde ser incluído no ZIP. Os arquivos podem não ter conteúdo disponível.");
+      return;
     }
     const blob = await zip.generateAsync({ type: "blob" });
     const url = URL.createObjectURL(blob);
