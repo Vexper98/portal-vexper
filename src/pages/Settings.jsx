@@ -202,7 +202,7 @@ export default function Settings() {
 
   return (
     <>
-      <AdminPanel users={users} onInvite={() => setInviteOpen(true)} />
+      <AdminPanel users={users} onInvite={() => setInviteOpen(true)} onEditRole={(u) => { setEditRoleUser(u); setEditRoleValue(u.role || "empresa"); }} />
 
       <Dialog open={inviteOpen} onOpenChange={setInviteOpen}>
         <DialogContent className="border-0 shadow-2xl">
