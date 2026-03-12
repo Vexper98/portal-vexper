@@ -20,6 +20,7 @@ const NAV_ITEMS = [
   { name: "Notificações", icon: Bell, page: "Notifications", roles: ["admin", "contador", "suporte", "empresa"] },
   { name: "Relatórios", icon: BarChart3, page: "Reports", roles: ["admin", "contador"] },
   { name: "Meus Clientes", icon: Users, page: "MyClients", roles: ["admin", "contador"] },
+  { name: "Meus Documentos", icon: Download, page: "Settings", roles: ["contador"] },
   { name: "Agente Sync", icon: Zap, page: "SyncAgent", roles: ["admin", "contador"] },
   { name: "Configurações", icon: Settings, page: "Settings", roles: ["admin"] },
 ];
