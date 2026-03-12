@@ -9,7 +9,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "
 import { Skeleton } from "@/components/ui/skeleton";
 import { toast } from "sonner";
 import { motion, AnimatePresence } from "framer-motion";
-import { Users, Shield, UserPlus, Settings as SettingsIcon, Cpu, Database, Zap, CheckCircle } from "lucide-react";
+import { Users, Shield, UserPlus, Settings as SettingsIcon, Cpu, Database, Zap, CheckCircle, Pencil } from "lucide-react";
 import ContadorPanel from "../components/settings/ContadorPanel";
 
 const roleBadge = {
