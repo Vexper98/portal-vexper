@@ -52,11 +52,11 @@ import CompanyDetail from './pages/CompanyDetail';
 import Dashboard from './pages/Dashboard';
 import DocumentUpload from './pages/DocumentUpload';
 import Documents from './pages/Documents';
+import MyClients from './pages/MyClients';
 import Notifications from './pages/Notifications';
 import Reports from './pages/Reports';
 import Settings from './pages/Settings';
 import SyncAgent from './pages/SyncAgent';
-import MyClients from './pages/MyClients';
 import __Layout from './Layout.jsx';
 
 
@@ -66,11 +66,11 @@ export const PAGES = {
     "Dashboard": Dashboard,
     "DocumentUpload": DocumentUpload,
     "Documents": Documents,
+    "MyClients": MyClients,
     "Notifications": Notifications,
     "Reports": Reports,
     "Settings": Settings,
     "SyncAgent": SyncAgent,
-    "MyClients": MyClients,
 }
 
 export const pagesConfig = {

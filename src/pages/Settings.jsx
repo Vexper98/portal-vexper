@@ -1,27 +1,140 @@
 import React, { useState, useEffect } from "react";
 import { base44 } from "@/api/base44Client";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Users, Shield, UserPlus, Settings as SettingsIcon } from "lucide-react";
-import ContadorPanel from "../components/settings/ContadorPanel";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Skeleton } from "@/components/ui/skeleton";
 import { toast } from "sonner";
+import { motion, AnimatePresence } from "framer-motion";
+import { Users, Shield, UserPlus, Settings as SettingsIcon, Cpu, Database, Zap, CheckCircle } from "lucide-react";
+import ContadorPanel from "../components/settings/ContadorPanel";
 
 const roleBadge = {
-  admin: "bg-red-50 text-red-700 border-red-200",
-  contador: "bg-blue-50 text-blue-700 border-blue-200",
-  empresa: "bg-emerald-50 text-emerald-700 border-emerald-200",
-  suporte: "bg-purple-50 text-purple-700 border-purple-200",
+  admin: "bg-red-500/20 text-red-400 border-red-500/30",
+  contador: "bg-blue-500/20 text-blue-400 border-blue-500/30",
+  empresa: "bg-emerald-500/20 text-emerald-400 border-emerald-500/30",
+  suporte: "bg-purple-500/20 text-purple-400 border-purple-500/30",
 };
-
 const roleLabel = { admin: "Administrador", contador: "Contador", empresa: "Empresa", suporte: "Suporte" };
+
+const roleIcon = { admin: "🔴", contador: "🔵", empresa: "🟢", suporte: "🟣" };
+
+function AdminPanel({ users, onInvite }) {
+  const stats = [
+    { label: "Total Usuários", value: users.length, icon: Users, color: "from-blue-500 to-cyan-500" },
+    { label: "Admins", value: users.filter(u => u.role === "admin").length, icon: Shield, color: "from-red-500 to-pink-500" },
+    { label: "Contadores", value: users.filter(u => u.role === "contador").length, icon: Cpu, color: "from-violet-500 to-purple-500" },
+    { label: "Empresas", value: users.filter(u => u.role === "empresa").length, icon: Database, color: "from-emerald-500 to-teal-500" },
+  ];
+
+  return (
+    <div className="space-y-8">
+      {/* Hero */}
+      <div className="relative rounded-2xl overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-br from-[#0f1729] via-[#1a2744] to-[#0f2d4a]" />
+        {/* Grid overlay */}
+        <div className="absolute inset-0 opacity-10"
+          style={{ backgroundImage: "linear-gradient(rgba(99,179,237,0.4) 1px, transparent 1px), linear-gradient(90deg, rgba(99,179,237,0.4) 1px, transparent 1px)", backgroundSize: "40px 40px" }} />
+        {/* Glow */}
+        <div className="absolute top-0 right-0 w-96 h-96 bg-blue-500/20 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />
+        <div className="absolute bottom-0 left-0 w-64 h-64 bg-cyan-500/10 rounded-full blur-3xl translate-y-1/2 -translate-x-1/2" />
+
+        <div className="relative p-8">
+          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
+            <div className="flex items-center gap-3 mb-2">
+              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500 to-cyan-400 flex items-center justify-center shadow-lg shadow-blue-500/30">
+                <Shield className="w-5 h-5 text-white" />
+              </div>
+              <Badge className="bg-blue-500/20 text-blue-300 border-blue-500/30 text-[10px] uppercase tracking-widest">Admin</Badge>
+            </div>
+            <h1 className="text-3xl font-bold text-white mt-3">Painel Administrativo</h1>
+            <p className="text-slate-400 mt-1 text-sm">Gerencie usuários, permissões e configurações do sistema</p>
+          </motion.div>
+        </div>
+      </div>
+
+      {/* Stats */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        {stats.map((s, i) => (
+          <motion.div key={s.label} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.08 }}>
+            <div className="relative rounded-2xl overflow-hidden border border-slate-200/60 bg-white shadow-sm hover:shadow-md transition-shadow group">
+              <div className={`absolute top-0 left-0 right-0 h-0.5 bg-gradient-to-r ${s.color}`} />
+              <div className="p-5">
+                <div className={`w-9 h-9 rounded-xl bg-gradient-to-br ${s.color} flex items-center justify-center mb-3 shadow-sm group-hover:scale-110 transition-transform`}>
+                  <s.icon className="w-4 h-4 text-white" />
+                </div>
+                <p className="text-2xl font-bold text-slate-800">{s.value}</p>
+                <p className="text-xs text-slate-400 mt-0.5">{s.label}</p>
+              </div>
+            </div>
+          </motion.div>
+        ))}
+      </div>
+
+      {/* Users Table */}
+      <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}
+        className="rounded-2xl border border-slate-200/60 bg-white shadow-sm overflow-hidden">
+        <div className="flex items-center justify-between px-6 py-4 border-b border-slate-100 bg-gradient-to-r from-slate-50 to-white">
+          <div className="flex items-center gap-3">
+            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-500 to-cyan-500 flex items-center justify-center">
+              <Users className="w-4 h-4 text-white" />
+            </div>
+            <div>
+              <h2 className="text-sm font-semibold text-slate-800">Usuários do Sistema</h2>
+              <p className="text-[11px] text-slate-400">{users.length} usuários cadastrados</p>
+            </div>
+          </div>
+          <Button onClick={onInvite} size="sm" className="bg-gradient-to-r from-blue-600 to-cyan-600 text-white border-0 hover:opacity-90 shadow-md shadow-blue-500/20">
+            <UserPlus className="w-3.5 h-3.5 mr-1.5" /> Convidar
+          </Button>
+        </div>
+
+        <div className="divide-y divide-slate-50">
+          <AnimatePresence>
+            {users.map((u, i) => (
+              <motion.div key={u.id} initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: i * 0.04 }}
+                className="flex items-center gap-4 px-6 py-3.5 hover:bg-slate-50/50 transition-colors group">
+                <div className="w-9 h-9 rounded-full bg-gradient-to-br from-slate-200 to-slate-300 flex items-center justify-center text-sm font-bold text-slate-600 flex-shrink-0 group-hover:from-blue-100 group-hover:to-cyan-100 group-hover:text-blue-700 transition-all">
+                  {u.full_name?.[0]?.toUpperCase() || u.email?.[0]?.toUpperCase() || "?"}
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-medium text-slate-800 truncate">{u.full_name || "—"}</p>
+                  <p className="text-xs text-slate-400 truncate">{u.email}</p>
+                </div>
+                <Badge variant="outline" className={`text-[10px] font-semibold ${roleBadge[u.role] || ""}`}>
+                  {roleIcon[u.role]} {roleLabel[u.role] || u.role}
+                </Badge>
+              </motion.div>
+            ))}
+          </AnimatePresence>
+        </div>
+      </motion.div>
+
+      {/* System Info */}
+      <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4 }}
+        className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        {[
+          { icon: Cpu, label: "Versão do Sistema", value: "v1.0.0", color: "from-blue-500 to-cyan-500", bg: "bg-blue-50" },
+          { icon: Database, label: "Documentos Suportados", value: "NF-e, NFC-e, CT-e, NFS-e", color: "from-violet-500 to-purple-500", bg: "bg-violet-50" },
+          { icon: Zap, label: "Agente Desktop", value: "Windows • Linux • macOS", color: "from-amber-500 to-orange-500", bg: "bg-amber-50" },
+        ].map((item, i) => (
+          <div key={item.label} className={`rounded-2xl ${item.bg} border border-slate-200/60 p-5 flex items-center gap-4`}>
+            <div className={`w-10 h-10 rounded-xl bg-gradient-to-br ${item.color} flex items-center justify-center shadow-sm`}>
+              <item.icon className="w-4 h-4 text-white" />
+            </div>
+            <div>
+              <p className="text-[11px] text-slate-400 uppercase tracking-wide">{item.label}</p>
+              <p className="text-sm font-semibold text-slate-700 mt-0.5">{item.value}</p>
+            </div>
+          </div>
+        ))}
+      </motion.div>
+    </div>
+  );
+}
 
 export default function Settings() {
   const [users, setUsers] = useState([]);
@@ -30,7 +143,6 @@ export default function Settings() {
   const [inviteEmail, setInviteEmail] = useState("");
   const [inviteRole, setInviteRole] = useState("empresa");
   const [inviting, setInviting] = useState(false);
-
   const [currentUser, setCurrentUser] = useState(null);
 
   useEffect(() => {
@@ -50,136 +162,69 @@ export default function Settings() {
     if (!inviteEmail) return;
     setInviting(true);
     await base44.users.inviteUser(inviteEmail, inviteRole === "admin" ? "admin" : "user");
-    // After invite, we'd want to also update the role for the user once they accept
     toast.success(`Convite enviado para ${inviteEmail}`);
     setInviteEmail("");
     setInviting(false);
     setInviteOpen(false);
   };
 
-  if (loading) return <div className="space-y-4">{[1,2,3].map(i => <Skeleton key={i} className="h-16 rounded-xl" />)}</div>;
+  if (loading) return (
+    <div className="space-y-4">
+      {[1, 2, 3, 4].map(i => <Skeleton key={i} className="h-20 rounded-2xl" />)}
+    </div>
+  );
 
   if (currentUser?.role !== "admin") {
     return (
       <div className="space-y-6">
-        <div>
-          <h1 className="text-2xl font-bold text-slate-900">Painel do Contador</h1>
-          <p className="text-sm text-slate-500 mt-1">Documentos recebidos dos seus clientes</p>
-        </div>
         <ContadorPanel user={currentUser} />
       </div>
     );
   }
 
   return (
-    <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold text-slate-900">Configurações</h1>
-        <p className="text-sm text-slate-500 mt-1">Gerenciar usuários e permissões</p>
-      </div>
+    <>
+      <AdminPanel users={users} onInvite={() => setInviteOpen(true)} />
 
-      <Tabs defaultValue="users" className="space-y-4">
-        <TabsList className="bg-slate-100">
-          <TabsTrigger value="users"><Users className="w-4 h-4 mr-2" /> Usuários</TabsTrigger>
-          <TabsTrigger value="system"><SettingsIcon className="w-4 h-4 mr-2" /> Sistema</TabsTrigger>
-        </TabsList>
-
-        <TabsContent value="users">
-          <Card className="border-0 shadow-sm">
-            <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className="text-base font-semibold">Usuários do Sistema</CardTitle>
-              <Button size="sm" onClick={() => setInviteOpen(true)} className="bg-blue-600 hover:bg-blue-700">
-                <UserPlus className="w-4 h-4 mr-2" /> Convidar Usuário
-              </Button>
-            </CardHeader>
-            <CardContent>
-              <div className="overflow-x-auto">
-                <Table>
-                  <TableHeader>
-                    <TableRow className="border-slate-100">
-                      <TableHead className="text-xs font-semibold text-slate-500 uppercase">Usuário</TableHead>
-                      <TableHead className="text-xs font-semibold text-slate-500 uppercase">E-mail</TableHead>
-                      <TableHead className="text-xs font-semibold text-slate-500 uppercase">Perfil</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {users.map(user => (
-                      <TableRow key={user.id} className="border-slate-100">
-                        <TableCell className="font-medium text-sm">{user.full_name || "—"}</TableCell>
-                        <TableCell className="text-sm text-slate-600">{user.email}</TableCell>
-                        <TableCell>
-                          <Badge variant="outline" className={`text-[10px] font-semibold ${roleBadge[user.role] || ""}`}>
-                            {roleLabel[user.role] || user.role}
-                          </Badge>
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
-
-        <TabsContent value="system">
-          <Card className="border-0 shadow-sm">
-            <CardHeader className="pb-2"><CardTitle className="text-base font-semibold">Informações do Sistema</CardTitle></CardHeader>
-            <CardContent className="space-y-4">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="p-4 rounded-xl bg-slate-50">
-                  <p className="text-xs text-slate-400 mb-1">Versão</p>
-                  <p className="text-sm font-medium text-slate-700">1.0.0</p>
-                </div>
-                <div className="p-4 rounded-xl bg-slate-50">
-                  <p className="text-xs text-slate-400 mb-1">Tipos de Documento Suportados</p>
-                  <p className="text-sm font-medium text-slate-700">NF-e, NFC-e, CT-e, NFS-e, PDF</p>
-                </div>
-              </div>
-              <div className="p-4 rounded-xl bg-blue-50 border border-blue-100">
-                <div className="flex items-center gap-2 mb-2">
-                  <Shield className="w-4 h-4 text-blue-600" />
-                  <p className="text-sm font-semibold text-blue-700">Sobre o Agente de Sincronização</p>
-                </div>
-                <p className="text-xs text-blue-600 leading-relaxed">
-                  O agente de sincronização automática é um módulo que pode ser instalado no ambiente do cliente para monitorar pastas e enviar automaticamente novos arquivos XML e PDF para o portal. 
-                  Por enquanto, utilize o upload manual pela interface web. A integração com agente desktop será disponibilizada em versão futura.
-                </p>
-              </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
-      </Tabs>
-
-      {/* Invite Dialog */}
       <Dialog open={inviteOpen} onOpenChange={setInviteOpen}>
-        <DialogContent>
-          <DialogHeader><DialogTitle>Convidar Usuário</DialogTitle></DialogHeader>
-          <div className="space-y-3">
+        <DialogContent className="border-0 shadow-2xl">
+          <div className="absolute inset-0 rounded-lg bg-gradient-to-br from-slate-50 to-white -z-10" />
+          <DialogHeader>
+            <div className="flex items-center gap-3 mb-1">
+              <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-600 to-cyan-500 flex items-center justify-center">
+                <UserPlus className="w-4 h-4 text-white" />
+              </div>
+              <DialogTitle className="text-lg font-bold">Convidar Usuário</DialogTitle>
+            </div>
+          </DialogHeader>
+          <div className="space-y-4 py-2">
             <div className="space-y-1.5">
-              <Label>E-mail *</Label>
-              <Input type="email" value={inviteEmail} onChange={e => setInviteEmail(e.target.value)} placeholder="usuario@empresa.com" />
+              <Label className="text-xs font-semibold text-slate-600 uppercase tracking-wide">E-mail *</Label>
+              <Input type="email" value={inviteEmail} onChange={e => setInviteEmail(e.target.value)}
+                placeholder="usuario@empresa.com" className="rounded-xl border-slate-200 focus:border-blue-400" />
             </div>
             <div className="space-y-1.5">
-              <Label>Perfil</Label>
+              <Label className="text-xs font-semibold text-slate-600 uppercase tracking-wide">Perfil</Label>
               <Select value={inviteRole} onValueChange={setInviteRole}>
-                <SelectTrigger><SelectValue /></SelectTrigger>
+                <SelectTrigger className="rounded-xl border-slate-200"><SelectValue /></SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="admin">Administrador</SelectItem>
-                  <SelectItem value="contador">Contador</SelectItem>
-                  <SelectItem value="empresa">Empresa</SelectItem>
-                  <SelectItem value="suporte">Suporte</SelectItem>
+                  <SelectItem value="admin">🔴 Administrador</SelectItem>
+                  <SelectItem value="contador">🔵 Contador</SelectItem>
+                  <SelectItem value="empresa">🟢 Empresa</SelectItem>
+                  <SelectItem value="suporte">🟣 Suporte</SelectItem>
                 </SelectContent>
               </Select>
             </div>
           </div>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setInviteOpen(false)}>Cancelar</Button>
-            <Button onClick={handleInvite} disabled={!inviteEmail || inviting} className="bg-blue-600 hover:bg-blue-700">
-              {inviting ? "Enviando..." : "Enviar Convite"}
+          <DialogFooter className="gap-2">
+            <Button variant="outline" onClick={() => setInviteOpen(false)} className="rounded-xl">Cancelar</Button>
+            <Button onClick={handleInvite} disabled={!inviteEmail || inviting}
+              className="bg-gradient-to-r from-blue-600 to-cyan-600 text-white border-0 hover:opacity-90 rounded-xl shadow-md shadow-blue-500/20">
+              {inviting ? "Enviando..." : <><CheckCircle className="w-4 h-4 mr-1.5" /> Enviar Convite</>}
             </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
-    </div>
+    </>
   );
 }
