@@ -89,7 +89,7 @@ export default function Dashboard() {
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <StatCard title="Empresas Ativas" value={activeCompanies} icon={Building2} color="blue" subtitle={`${companies.length} total`} />
         <StatCard title="Docs Hoje" value={docsToday} icon={FileText} color="green" subtitle={`${docsWeek} na semana · ${docsMonth} no mês`} />
-        <StatCard title="Erros Pendentes" value={docsErro} icon={AlertTriangle} color="red" subtitle="Necessitam atenção" />
+        <StatCard title="Via Agente" value={agentDocs.length} icon={CheckCircle2} color="cyan" subtitle={`${companiesWithAgentDocs} empresa(s)`} />
         <StatCard title="Sem Envio (7d+)" value={companiesNoSend.length} icon={Clock} color="orange" subtitle="Empresas paradas" />
       </div>
 
