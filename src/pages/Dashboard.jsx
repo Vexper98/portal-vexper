@@ -49,10 +49,11 @@ export default function Dashboard() {
   const monthStart = startOfMonth(now).toISOString();
 
   const docsToday  = documents.filter(d => (d.uploadedAt || d.created_date || "") >= todayStart).length;
-  const docsWeek   = documents.filter(d => (d.uploadedAt || d.created_date || "") >= weekStart).length;
-  const docsMonth  = documents.filter(d => (d.uploadedAt || d.created_date || "") >= monthStart).length;
-  const docsErro   = documents.filter(d => d.status === "erro").length;
-  const agentDocs  = documents.filter(d => d.source === "agent").length;
+   const docsWeek   = documents.filter(d => (d.uploadedAt || d.created_date || "") >= weekStart).length;
+   const docsMonth  = documents.filter(d => (d.uploadedAt || d.created_date || "") >= monthStart).length;
+   const docsErro   = documents.filter(d => d.status === "erro").length;
+   const agentDocs  = documents.filter(d => d.source === "agent").length;
+   const docsXml    = documents.filter(d => d.documentType === "XML").length;
   const activeCompanies = companies.filter(c => c.active !== false && c.status !== "inativa").length;
 
   const companiesNoSend = companies.filter(c => {
