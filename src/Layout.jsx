@@ -79,7 +79,8 @@ export default function Layout({ children, currentPageName }) {
         {/* Nav */}
         <nav className="flex-1 px-3 py-4 space-y-0.5 overflow-y-auto">
           {filteredNav.map((item) => {
-            const isActive = currentPageName === item.page || (item.path && window.location.pathname === item.path);
+            const itemPath = item.path || `/${item.page}`;
+            const isActive = location.pathname === itemPath || location.pathname === `/${item.page}`;
             return (
               <Link
                 key={item.name + item.page}
