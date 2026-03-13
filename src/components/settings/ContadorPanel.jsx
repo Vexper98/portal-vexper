@@ -177,7 +177,7 @@ export default function ContadorPanel({ user }) {
     <div className="space-y-4">
       {[1, 2, 3, 4, 5].map(i => (
         <motion.div key={i} initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: i * 0.07 }}>
-          <Skeleton className="h-20 rounded-2xl" />
+          <Skeleton className="h-20 rounded-2xl" style={{ background: "rgba(255,255,255,0.04)" }} />
         </motion.div>
       ))}
     </div>
