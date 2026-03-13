@@ -316,7 +316,7 @@ export default function ContadorPanel({ user }) {
                       {c.razao_social?.[0]?.toUpperCase()}
                     </div>
                     <div className="min-w-0 flex-1">
-                      <p className={`text-sm font-bold truncate ${isActive ? "text-blue-800" : "text-slate-800"}`}>
+                      <p className={`text-sm font-bold truncate ${isActive ? "text-cyan-300" : "text-slate-200"}`}>
                         {c.razao_social}
                       </p>
                       <p className="text-[11px] text-slate-400 truncate font-mono">{c.cnpj}</p>
