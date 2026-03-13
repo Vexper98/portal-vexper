@@ -150,13 +150,7 @@ export default function Documents() {
 
   const handleDownloadOriginal = (doc) => {
     if (!doc.fileUrl) { handleDownload(doc); return; }
-    const a = document.createElement("a");
-    a.href = doc.fileUrl;
-    a.download = doc.originalFilename || doc.filename || `${doc.id}.xml`;
-    a.target = "_blank";
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
+    triggerDownload(doc.fileUrl, doc.originalFilename || doc.filename || `${doc.id}.xml`);
   };
 
   const copyKey = (key, id) => {
