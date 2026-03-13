@@ -69,12 +69,15 @@ export default function ContadorPanel({ user }) {
   const toggleAll = () => setSelected(selected.length === filtered.length ? [] : filtered.map(d => d.id));
 
   const triggerDownload = (content, filename, mimeType = "application/xml") => {
-    const blob = new Blob([content], { type: mimeType });
+    // Accept both Blob (e.g. ZIP) and string (XML text) — never double-wrap
+    const blob = content instanceof Blob ? content : new Blob([content], { type: mimeType });
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
     a.download = filename;
+    document.body.appendChild(a);
     a.click();
+    document.body.removeChild(a);
     URL.revokeObjectURL(url);
   };
 
