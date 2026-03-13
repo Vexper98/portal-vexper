@@ -87,7 +87,7 @@ export default function Documents() {
       myCompanies = comps; // admin / suporte veem tudo
       myDocs = docs;
     }
-    setDocuments(myDocs);
+    setDocuments(myDocs || docs);
     setCompanies(myCompanies);
     const map = {};
     myCompanies.forEach(c => { map[c.id] = c; });
