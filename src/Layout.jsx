@@ -24,6 +24,7 @@ const NAV_ITEMS = [
   { name: "Meus Clientes",  icon: Users,           page: "MyClients",      roles: ["admin", "contador"] },
   { name: "Meus Documentos",icon: Download,        page: "Settings",       roles: ["contador"] },
   { name: "Cronograma",     icon: CalendarCheck,   page: "FiscalSchedule", path: "/FiscalSchedule", roles: ["admin"] },
+  { name: "Calendário Fiscal", icon: CalendarCheck, page: "FiscalCalendar", path: "/FiscalCalendar", roles: ["contador", "suporte", "empresa"] },
   { name: "Agente Sync",    icon: Zap,             page: "SyncAgent",      roles: ["admin", "contador"] },
   { name: "Configurações",  icon: Settings,        page: "Settings",       roles: ["admin"] },
 ];
