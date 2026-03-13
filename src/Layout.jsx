@@ -55,14 +55,11 @@ export default function Layout({ children, currentPageName }) {
     <div className="min-h-screen flex" style={{ background: "#060d1f" }}>
       {/* Sidebar */}
       <aside
-        className="fixed inset-y-0 left-0 z-50 w-64 flex flex-col"
+        className={`fixed inset-y-0 left-0 z-50 w-64 flex flex-col ${sidebarOpen ? "translate-x-0" : "-translate-x-full"} lg:translate-x-0 transition-transform duration-300 ease-in-out`}
         style={{
           background: "linear-gradient(180deg, #080f24 0%, #060d1f 100%)",
           borderRight: "1px solid rgba(6,182,212,0.1)",
-          transform: sidebarOpen ? "translateX(0)" : "translateX(-100%)",
-          transition: "transform 0.3s cubic-bezier(0.4,0,0.2,1)",
         }}
-        // Override on lg screens via inline conditional won't work well; use className trick below
       >
 
         {/* Logo area */}
