@@ -341,8 +341,9 @@ export default function ContadorPanel({ user }) {
         style={{ background: "linear-gradient(135deg, #0a1628, #0d1e35)", border: "1px solid rgba(6,182,212,0.12)" }}>
 
         {/* Table Header */}
-        <div className="relative px-6 py-5 border-b border-slate-100 overflow-hidden">
-          <div className="absolute inset-0 bg-gradient-to-r from-slate-50 via-blue-50/20 to-white" />
+        <div className="relative px-6 py-5 overflow-hidden" style={{ borderBottom: "1px solid rgba(255,255,255,0.06)" }}>
+          <div className="absolute inset-0 opacity-[0.03]"
+            style={{ backgroundImage: "radial-gradient(circle at 1px 1px, rgba(6,182,212,1) 1px, transparent 0)", backgroundSize: "24px 24px" }} />
           <div className="relative">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
               <div className="flex items-center gap-3">
