@@ -143,13 +143,8 @@ export default function Documents() {
     }));
     const blob = await zip.generateAsync({ type: "blob" });
     const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = `documentos_fiscais_${format(new Date(), "yyyyMMdd_HHmm")}.zip`;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
+    triggerDownload(url, `documentos_fiscais_${format(new Date(), "yyyyMMdd_HHmm")}.zip`);
+    setTimeout(() => URL.revokeObjectURL(url), 200);
     setDownloading(false);
   };
 
