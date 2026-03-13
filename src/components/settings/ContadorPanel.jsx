@@ -528,7 +528,7 @@ export default function ContadorPanel({ user }) {
 
         {/* Footer */}
         {filtered.length > 0 && (
-          <div className="px-6 py-3 border-t border-slate-100 bg-slate-50/50 flex items-center justify-between">
+          <div className="px-6 py-3 flex items-center justify-between" style={{ borderTop: "1px solid rgba(255,255,255,0.05)" }}>
             <p className="text-xs text-slate-400">{filtered.length} documento(s) · {selected.length} selecionado(s)</p>
             {selected.length > 0 && (
               <button onClick={() => setSelected([])} className="text-xs text-slate-400 hover:text-slate-600 underline-offset-2 hover:underline">
