@@ -81,15 +81,21 @@ export default function ContadorPanel({ user }) {
     URL.revokeObjectURL(url);
   };
 
+  const ensureXmlExt = (name) => {
+    if (!name) return "documento.xml";
+    return name.toLowerCase().endsWith(".xml") ? name : `${name}.xml`;
+  };
+
   const getDocContent = async (doc) => {
+    const filename = ensureXmlExt(doc.filename);
     // If has xmlContent directly, use it
-    if (doc.xmlContent) return { content: doc.xmlContent, filename: doc.filename };
+    if (doc.xmlContent) return { content: doc.xmlContent, filename };
     // If has fileUrl, fetch it
     if (doc.fileUrl) {
       const resp = await fetch(doc.fileUrl);
       if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
       const text = await resp.text();
-      return { content: text, filename: doc.filename };
+      return { content: text, filename };
     }
     return null;
   };
