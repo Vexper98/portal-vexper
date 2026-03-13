@@ -71,12 +71,19 @@ export default function Documents() {
       base44.entities.Document.list("-created_date", 500),
       base44.entities.Company.list("-created_date", 200),
     ]);
-    const restricted = u?.role === "contador";
-    const myCompanies = restricted
-      ? comps.filter(c => c.contadorEmail === u.email || c.contador_responsavel === u.email)
-      : comps;
+    const role = u?.role;
+    let myCompanies;
+    if (role === "contador") {
+      myCompanies = comps.filter(c => c.contadorEmail === u.email || c.contador_responsavel === u.email);
+    } else if (role === "empresa") {
+      myCompanies = comps.filter(c => c.created_by === u.email);
+    } else {
+      myCompanies = comps; // admin / suporte veem tudo
+    }
     const myIds = new Set(myCompanies.map(c => c.id));
-    const myDocs = restricted ? docs.filter(d => myIds.has(d.companyId)) : docs;
+    const myDocs = (role === "contador" || role === "empresa")
+      ? docs.filter(d => myIds.has(d.companyId))
+      : docs;
     setDocuments(myDocs);
     setCompanies(myCompanies);
     const map = {};
