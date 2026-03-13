@@ -170,7 +170,7 @@ export default function Layout({ children, currentPageName }) {
             {/* Current page label */}
             <span className="hidden sm:block text-xs text-slate-600 font-mono uppercase tracking-widest">{currentPageName}</span>
             <div className="w-px h-4 bg-white/10 hidden sm:block" />
-            <Link to={createPageUrl("Notifications")} className="relative p-2 rounded-lg hover:bg-white/5 transition-colors text-slate-500 hover:text-slate-200">
+            <Link to="/Notifications" className="relative p-2 rounded-lg hover:bg-white/5 transition-colors text-slate-500 hover:text-slate-200">
               <Bell className="w-4 h-4" />
               {unreadCount > 0 && (
                 <span className="absolute top-1.5 right-1.5 w-1.5 h-1.5 bg-red-500 rounded-full" />
