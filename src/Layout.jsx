@@ -125,7 +125,7 @@ export default function Layout({ children, currentPageName }) {
                 </button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-52" style={{ background: "#0d1b38", border: "1px solid rgba(6,182,212,0.15)", color: "white" }}>
-                <DropdownMenuItem onClick={() => navigate(createPageUrl("Settings"))} className="text-slate-300 hover:text-white focus:text-white focus:bg-white/5">
+                <DropdownMenuItem onClick={() => navigate("/Settings")} className="text-slate-300 hover:text-white focus:text-white focus:bg-white/5">
                   <Settings className="w-4 h-4 mr-2 text-slate-500" /> Configurações
                 </DropdownMenuItem>
                 <DropdownMenuSeparator style={{ background: "rgba(255,255,255,0.06)" }} />
