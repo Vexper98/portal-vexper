@@ -8,6 +8,7 @@ import { AuthProvider, useAuth } from '@/lib/AuthContext';
 import UserNotRegisteredError from '@/components/UserNotRegisteredError';
 import LoadingScreen from '@/components/LoadingScreen';
 import FiscalSchedule from './pages/FiscalSchedule';
+import FiscalCalendar from './pages/FiscalCalendar';
 
 const { Pages, Layout, mainPage } = pagesConfig;
 const mainPageKey = mainPage ?? Object.keys(Pages)[0];
