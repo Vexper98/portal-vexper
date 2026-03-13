@@ -1,0 +1,98 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 220 40% 5%;
+    --foreground: 213 31% 91%;
+    --card: 220 35% 8%;
+    --card-foreground: 213 31% 91%;
+    --popover: 220 35% 8%;
+    --popover-foreground: 213 31% 91%;
+    --primary: 199 89% 48%;
+    --primary-foreground: 220 40% 5%;
+    --secondary: 220 30% 12%;
+    --secondary-foreground: 213 31% 91%;
+    --muted: 220 30% 12%;
+    --muted-foreground: 215 20% 50%;
+    --accent: 220 30% 14%;
+    --accent-foreground: 213 31% 91%;
+    --destructive: 0 63% 55%;
+    --destructive-foreground: 213 31% 91%;
+    --border: 220 20% 15%;
+    --input: 220 20% 15%;
+    --ring: 199 89% 48%;
+    --radius: 0.5rem;
+    --sidebar-background: 220 40% 5%;
+    --sidebar-foreground: 213 31% 91%;
+    --sidebar-primary: 199 89% 48%;
+    --sidebar-primary-foreground: 220 40% 5%;
+    --sidebar-accent: 220 30% 12%;
+    --sidebar-accent-foreground: 213 31% 91%;
+    --sidebar-border: 220 20% 15%;
+    --sidebar-ring: 199 89% 48%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+
+  body {
+    background: #060d1f !important;
+    color: #cbd5e1;
+    font-family: system-ui, -apple-system, sans-serif;
+  }
+
+  /* Dark card overrides */
+  .bg-white {
+    background-color: #0a1628 !important;
+  }
+  .bg-slate-50 {
+    background-color: #080f21 !important;
+  }
+  .bg-slate-100 {
+    background-color: #0d1730 !important;
+  }
+  .text-slate-800, .text-slate-900 {
+    color: #e2e8f0 !important;
+  }
+  .text-slate-700 {
+    color: #cbd5e1 !important;
+  }
+  .text-slate-600 {
+    color: #94a3b8 !important;
+  }
+  .border-slate-200 {
+    border-color: rgba(255,255,255,0.08) !important;
+  }
+  .border-slate-100 {
+    border-color: rgba(255,255,255,0.05) !important;
+  }
+  .divide-slate-50 > * + * {
+    border-color: rgba(255,255,255,0.04) !important;
+  }
+
+  /* Inputs dark */
+  input, textarea, select {
+    background-color: rgba(255,255,255,0.05) !important;
+    color: #e2e8f0 !important;
+    border-color: rgba(255,255,255,0.1) !important;
+  }
+  input::placeholder, textarea::placeholder {
+    color: #475569 !important;
+  }
+
+  /* Table overrides */
+  thead tr {
+    background-color: rgba(255,255,255,0.03) !important;
+  }
+  th {
+    color: #64748b !important;
+  }
+  tr:hover {
+    background-color: rgba(255,255,255,0.03) !important;
+  }
+}
