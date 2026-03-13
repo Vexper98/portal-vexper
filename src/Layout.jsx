@@ -23,7 +23,7 @@ const NAV_ITEMS = [
   { name: "Relatórios",     icon: BarChart3,       page: "Reports",        roles: ["admin", "contador"] },
   { name: "Meus Clientes",  icon: Users,           page: "MyClients",      roles: ["admin", "contador"] },
   { name: "Meus Documentos",icon: Download,        page: "Settings",       roles: ["contador"] },
-  { name: "Cronograma",     icon: CalendarCheck,   page: "FiscalSchedule", path: "/FiscalSchedule", roles: ["admin", "contador"] },
+  { name: "Cronograma",     icon: CalendarCheck,   page: "FiscalSchedule", path: "/FiscalSchedule", roles: ["admin"] },
   { name: "Agente Sync",    icon: Zap,             page: "SyncAgent",      roles: ["admin", "contador"] },
   { name: "Configurações",  icon: Settings,        page: "Settings",       roles: ["admin"] },
 ];
