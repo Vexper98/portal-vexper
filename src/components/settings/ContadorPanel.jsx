@@ -337,7 +337,8 @@ export default function ContadorPanel({ user }) {
 
       {/* Documents Table */}
       <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4 }}
-        className="rounded-3xl border border-slate-200/60 bg-white shadow-sm overflow-hidden">
+        className="rounded-3xl overflow-hidden"
+        style={{ background: "linear-gradient(135deg, #0a1628, #0d1e35)", border: "1px solid rgba(6,182,212,0.12)" }}>
 
         {/* Table Header */}
         <div className="relative px-6 py-5 border-b border-slate-100 overflow-hidden">
