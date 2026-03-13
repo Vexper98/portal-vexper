@@ -123,7 +123,7 @@ export default function Dashboard() {
             <motion.img
               src={LOGO_URL}
               alt="Exper Sistemas"
-              className="h-12 w-auto"
+              className="h-20 w-auto"
               style={{ filter: "brightness(1.3) drop-shadow(0 0 12px rgba(6,182,212,0.4))" }}
               animate={{ filter: ["brightness(1.1) drop-shadow(0 0 8px rgba(6,182,212,0.3))", "brightness(1.4) drop-shadow(0 0 16px rgba(6,182,212,0.6))", "brightness(1.1) drop-shadow(0 0 8px rgba(6,182,212,0.3))"] }}
               transition={{ duration: 4, repeat: Infinity }}

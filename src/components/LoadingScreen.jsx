@@ -109,7 +109,7 @@ export default function LoadingScreen() {
               style={{ background: "linear-gradient(90deg, #0ea5e9, #06b6d4, #3b82f6)" }}
               initial={{ width: "0%" }}
               animate={{ width: "100%" }}
-              transition={{ duration: 2.5, ease: "easeInOut", repeat: Infinity }}
+              transition={{ duration: 5, ease: "easeInOut", repeat: Infinity }}
             />
           </div>
 
