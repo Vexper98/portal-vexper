@@ -198,7 +198,9 @@ export default function ContadorPanel({ user }) {
     <div className="space-y-8">
       {/* Back */}
       <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }}>
-        <Button variant="outline" size="sm" className="rounded-xl gap-2 text-slate-600 hover:text-slate-800 border-slate-200"
+        <Button variant="outline" size="sm"
+          className="rounded-xl gap-2 border-white/10 text-slate-400 hover:text-white hover:border-cyan-500/40"
+          style={{ background: "rgba(255,255,255,0.04)" }}
           onClick={() => navigate("/Dashboard")}>
           <ArrowLeft className="w-4 h-4" /> Voltar ao Dashboard
         </Button>
