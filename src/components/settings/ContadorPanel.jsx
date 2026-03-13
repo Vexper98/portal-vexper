@@ -283,8 +283,8 @@ export default function ContadorPanel({ user }) {
             <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-cyan-500 to-blue-600 flex items-center justify-center">
               <Building2 className="w-3.5 h-3.5 text-white" />
             </div>
-            <h2 className="text-sm font-bold text-slate-600 uppercase tracking-wider">Seus Clientes</h2>
-            <div className="flex-1 h-px bg-gradient-to-r from-slate-200 to-transparent" />
+            <h2 className="text-sm font-bold text-cyan-400/80 uppercase tracking-wider">Seus Clientes</h2>
+            <div className="flex-1 h-px bg-gradient-to-r from-cyan-500/20 to-transparent" />
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
             {companies.map((c, i) => {
