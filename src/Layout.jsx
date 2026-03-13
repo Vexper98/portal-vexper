@@ -48,8 +48,8 @@ export default function Layout({ children, currentPageName }) {
   }, [user, currentPageName]);
 
   const knownRoles = ["admin", "contador", "suporte", "empresa"];
-  const userRole = knownRoles.includes(user?.role) ? user.role : "empresa";
-  const filteredNav = NAV_ITEMS.filter(item => item.roles.includes(userRole));
+  const userRole = user ? (knownRoles.includes(user.role) ? user.role : "empresa") : null;
+  const filteredNav = userRole ? NAV_ITEMS.filter(item => item.roles.includes(userRole)) : [];
 
   return (
     <div className="min-h-screen flex" style={{ background: "#060d1f" }}>
