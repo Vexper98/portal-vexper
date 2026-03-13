@@ -128,39 +128,56 @@ export default function ContadorPanel({ user }) {
 
     setDownloading(true);
     try {
-      // Process in batches of 20 to avoid timeouts
       const batchSize = 20;
       const zip = new JSZip();
       let added = 0;
-      const usedFilenames = new Set();
+
+      // Build a map: companyId → folder name (razao_social sanitized)
+      const companyFolderMap = {};
+      companies.forEach(c => {
+        const safe = (c.razao_social || c.id).replace(/[\\/:*?"<>|]/g, "_").slice(0, 50);
+        companyFolderMap[c.id] = safe;
+      });
+
+      // Track used paths to avoid duplicate filenames per folder
+      const usedPaths = new Set();
 
       for (let i = 0; i < docsToDownload.length; i += batchSize) {
         const batch = docsToDownload.slice(i, i + batchSize);
         const res = await base44.functions.invoke('getDocumentsForDownload', { 
           documentIds: batch.map(d => d.id) 
         });
-        
+
+        // Build id→original doc map for companyId lookup
+        const batchById = {};
+        batch.forEach(d => { batchById[d.id] = d; });
+
         for (const doc of res.data.documents) {
           const result = await getDocContent(doc).catch(() => null);
-          if (result?.content) {
-            // Ensure unique filenames
-            let fname = result.filename || `${doc.id}.xml`;
-            if (usedFilenames.has(fname)) {
-              const ext = fname.includes(".") ? fname.split(".").pop() : "xml";
-              fname = `${fname.replace(`.${ext}`, "")}_${doc.id}.${ext}`;
-            }
-            usedFilenames.add(fname);
-            zip.file(fname, result.content);
-            added++;
+          if (!result?.content) continue;
+
+          const folder = companyFolderMap[doc.companyId] || doc.companyId || "Outros";
+          let fname = result.filename;
+          let path = `${folder}/${fname}`;
+
+          // Deduplicate path
+          if (usedPaths.has(path)) {
+            const base = fname.replace(/\.xml$/i, "");
+            path = `${folder}/${base}_${doc.id}.xml`;
+            fname = `${base}_${doc.id}.xml`;
           }
+          usedPaths.add(path);
+
+          zip.file(path, result.content);
+          added++;
         }
       }
 
       if (added === 0) { toast.error("Nenhum arquivo pôde ser incluído no ZIP."); return; }
 
       const blob = await zip.generateAsync({ type: "blob" });
-      triggerDownload(blob, `documentos_${new Date().toISOString().slice(0,10)}.zip`, "application/zip");
-      toast.success(`${added} arquivo(s) baixado(s) com sucesso`);
+      triggerDownload(blob, `documentos_${new Date().toISOString().slice(0,10)}.zip`);
+      toast.success(`${added} arquivo(s) empacotados com sucesso`);
       setSelected([]);
     } catch (e) {
       console.error("Erro ao baixar arquivos:", e);
