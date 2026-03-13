@@ -18,6 +18,8 @@ export default function Dashboard() {
   const [documents, setDocuments] = useState([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
+  const [lastSync, setLastSync] = useState(null);
+  const [syncing, setSyncing] = useState(false);
 
   const load = useCallback(async (manual = false) => {
     if (manual) setRefreshing(true);
@@ -35,6 +37,8 @@ export default function Dashboard() {
     setCompanies(myCompanies);
     setDocuments(myDocs);
     setLoading(false);
+    setLastSync(new Date());
+    setSyncing(false);
     if (manual) setRefreshing(false);
   }, []);
 
