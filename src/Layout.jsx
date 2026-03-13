@@ -84,7 +84,7 @@ export default function Layout({ children, currentPageName }) {
             return (
               <Link
                 key={item.name + item.page}
-                to={item.path || createPageUrl(item.page)}
+                to={item.path || `/${item.page}`}
                 onClick={() => setSidebarOpen(false)}
                 className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 group relative ${
                   isActive
