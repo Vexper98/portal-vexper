@@ -68,67 +68,96 @@ export default function ContadorPanel({ user }) {
   const toggleSelect = (id) => setSelected(prev => prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id]);
   const toggleAll = () => setSelected(selected.length === filtered.length ? [] : filtered.map(d => d.id));
 
+  const triggerDownload = (content, filename, mimeType = "application/xml") => {
+    const blob = new Blob([content], { type: mimeType });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = filename;
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
+  const getDocContent = async (doc) => {
+    // If has xmlContent directly, use it
+    if (doc.xmlContent) return { content: doc.xmlContent, filename: doc.filename };
+    // If has fileUrl, fetch it
+    if (doc.fileUrl) {
+      const resp = await fetch(doc.fileUrl);
+      if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+      const text = await resp.text();
+      return { content: text, filename: doc.filename };
+    }
+    return null;
+  };
+
   const downloadDoc = async (doc) => {
+    setDownloading(true);
     try {
       const res = await base44.functions.invoke('getDocumentsForDownload', { documentIds: [doc.id] });
       const fullDoc = res.data.documents[0];
+      if (!fullDoc) { toast.error("Documento não encontrado"); return; }
       
-      if (fullDoc?.xmlContent) {
-        const blob = new Blob([fullDoc.xmlContent], { type: "application/xml" });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement("a");
-        a.href = url;
-        a.download = fullDoc.filename || "documento.xml";
-        a.click();
-        URL.revokeObjectURL(url);
+      const result = await getDocContent(fullDoc);
+      if (result) {
+        triggerDownload(result.content, result.filename || `${doc.id}.xml`);
       } else {
-        alert("Arquivo não contém conteúdo disponível para download");
+        toast.error("Arquivo sem conteúdo disponível para download");
       }
     } catch (e) {
       console.error("Erro ao baixar:", e);
-      alert("Erro ao baixar arquivo");
+      toast.error("Erro ao baixar arquivo");
+    } finally {
+      setDownloading(false);
     }
   };
 
   const downloadSelected = async () => {
     const docsToDownload = documents.filter(d => selected.includes(d.id));
-    if (docsToDownload.length === 1) { 
-      await downloadDoc(docsToDownload[0]); 
-      return; 
-    }
-    
+    if (docsToDownload.length === 0) return;
+    if (docsToDownload.length === 1) { await downloadDoc(docsToDownload[0]); return; }
+
+    setDownloading(true);
     try {
-      const res = await base44.functions.invoke('getDocumentsForDownload', { 
-        documentIds: docsToDownload.map(d => d.id) 
-      });
-      
-      const fullDocs = res.data.documents;
+      // Process in batches of 20 to avoid timeouts
+      const batchSize = 20;
       const zip = new JSZip();
       let added = 0;
-      
-      for (const doc of fullDocs) {
-        if (doc.xmlContent) {
-          zip.file(doc.filename || `${doc.id}.xml`, doc.xmlContent);
-          added++;
+      const usedFilenames = new Set();
+
+      for (let i = 0; i < docsToDownload.length; i += batchSize) {
+        const batch = docsToDownload.slice(i, i + batchSize);
+        const res = await base44.functions.invoke('getDocumentsForDownload', { 
+          documentIds: batch.map(d => d.id) 
+        });
+        
+        for (const doc of res.data.documents) {
+          const result = await getDocContent(doc).catch(() => null);
+          if (result?.content) {
+            // Ensure unique filenames
+            let fname = result.filename || `${doc.id}.xml`;
+            if (usedFilenames.has(fname)) {
+              const ext = fname.includes(".") ? fname.split(".").pop() : "xml";
+              fname = `${fname.replace(`.${ext}`, "")}_${doc.id}.${ext}`;
+            }
+            usedFilenames.add(fname);
+            zip.file(fname, result.content);
+            added++;
+          }
         }
       }
-      
-      if (added === 0) {
-        alert("Nenhum arquivo pôde ser incluído no ZIP.");
-        return;
-      }
-      
+
+      if (added === 0) { toast.error("Nenhum arquivo pôde ser incluído no ZIP."); return; }
+
       const blob = await zip.generateAsync({ type: "blob" });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = "documentos.zip";
-      a.click();
-      URL.revokeObjectURL(url);
+      triggerDownload(blob, `documentos_${new Date().toISOString().slice(0,10)}.zip`, "application/zip");
+      toast.success(`${added} arquivo(s) baixado(s) com sucesso`);
       setSelected([]);
     } catch (e) {
       console.error("Erro ao baixar arquivos:", e);
-      alert("Erro ao baixar arquivos");
+      toast.error("Erro ao baixar arquivos");
+    } finally {
+      setDownloading(false);
     }
   };
 
