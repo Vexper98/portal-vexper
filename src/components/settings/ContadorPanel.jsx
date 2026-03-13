@@ -401,6 +401,7 @@ export default function ContadorPanel({ user }) {
                         <TableCell>
                           <Button size="icon" variant="ghost"
                             className="h-7 w-7 opacity-0 group-hover:opacity-100 transition-opacity hover:bg-blue-100 hover:text-blue-600 rounded-lg"
+                            disabled={downloading}
                             onClick={() => downloadDoc(doc)}>
                             <Download className="w-3.5 h-3.5" />
                           </Button>
