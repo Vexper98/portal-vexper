@@ -351,7 +351,7 @@ export default function ContadorPanel({ user }) {
                   <FileText className="w-5 h-5 text-white" />
                 </div>
                 <div>
-                  <h2 className="text-base font-bold text-slate-800 flex items-center gap-2">
+                  <h2 className="text-base font-bold text-white flex items-center gap-2">
                     Documentos Fiscais
                     {filterCompany !== "all" && (
                       <span className="text-xs text-blue-600 font-normal bg-blue-50 px-2 py-0.5 rounded-full border border-blue-200/60">
