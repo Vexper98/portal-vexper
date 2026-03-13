@@ -65,7 +65,7 @@ export default function Layout({ children, currentPageName }) {
 
         {/* Logo area */}
         <div className="px-5 py-5 flex-shrink-0" style={{ borderBottom: "1px solid rgba(255,255,255,0.06)" }}>
-          <Link to={createPageUrl("Dashboard")} className="flex items-center gap-3" onClick={() => setSidebarOpen(false)}>
+          <Link to="/Dashboard" className="flex items-center gap-3" onClick={() => setSidebarOpen(false)}>
             <img
               src={LOGO_URL}
               alt="Exper Sistemas"
