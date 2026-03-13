@@ -14,20 +14,21 @@ Deno.serve(async (req) => {
       return Response.json({ error: 'documentIds array required' }, { status: 400 });
     }
 
-    // Fetch documents by IDs
-    const docs = [];
-    for (const docId of documentIds) {
-      const doc = await base44.asServiceRole.entities.Document.get(docId);
-      if (doc) {
-        docs.push({
-          id: doc.id,
-          filename: doc.originalFilename || doc.filename,
-          xmlContent: doc.xmlContent,
-          companyId: doc.companyId,
-          documentType: doc.documentType,
-        });
-      }
-    }
+    // Fetch all documents in parallel
+    const results = await Promise.all(
+      documentIds.map(id => base44.asServiceRole.entities.Document.get(id).catch(() => null))
+    );
+
+    const docs = results
+      .filter(doc => doc !== null)
+      .map(doc => ({
+        id: doc.id,
+        filename: doc.originalFilename || doc.filename,
+        xmlContent: doc.xmlContent || null,
+        fileUrl: doc.fileUrl || null,
+        companyId: doc.companyId,
+        documentType: doc.documentType,
+      }));
 
     return Response.json({ documents: docs });
   } catch (error) {
