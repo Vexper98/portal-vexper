@@ -296,8 +296,12 @@ export default function ContadorPanel({ user }) {
                   whileHover={{ y: -3, transition: { duration: 0.2 } }}
                   whileTap={{ scale: 0.98 }}
                   className={`relative rounded-2xl border overflow-hidden cursor-pointer transition-all ${isActive
-                    ? "border-blue-400/50 shadow-lg shadow-blue-500/15 bg-gradient-to-br from-blue-50 to-indigo-50"
-                    : "border-slate-200/60 shadow-sm hover:shadow-md bg-white"}`}
+                    ? "border-cyan-400/40 shadow-lg shadow-cyan-500/15"
+                    : "shadow-sm hover:shadow-md"}`}
+                  style={{
+                    background: isActive ? "rgba(6,182,212,0.08)" : "rgba(255,255,255,0.04)",
+                    borderColor: isActive ? "rgba(6,182,212,0.3)" : "rgba(255,255,255,0.07)"
+                  }}
                   onClick={() => setFilterCompany(isActive ? "all" : c.id)}>
                   <div className={`absolute top-0 left-0 right-0 h-1 bg-gradient-to-r ${docsCount > 0 ? "from-blue-500 to-cyan-500" : "from-slate-200 to-slate-300"}`} />
                   {isActive && (
