@@ -106,17 +106,22 @@ export default function Documents() {
     loadData();
   };
 
+  const triggerDownload = (href, filename) => {
+    const a = document.createElement("a");
+    a.href = href;
+    a.download = filename;
+    a.style.display = "none";
+    document.body.appendChild(a);
+    a.click();
+    setTimeout(() => { a.remove(); }, 100);
+  };
+
   const handleDownload = (doc) => {
     const content = doc.xmlContent || "";
     const blob = new Blob([content], { type: "text/xml" });
     const blobUrl = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = doc.fileUrl || blobUrl;
-    a.download = doc.filename || `${doc.id}.xml`;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(blobUrl);
+    triggerDownload(doc.fileUrl || blobUrl, doc.filename || `${doc.id}.xml`);
+    setTimeout(() => URL.revokeObjectURL(blobUrl), 200);
   };
 
   const [downloading, setDownloading] = useState(false);
