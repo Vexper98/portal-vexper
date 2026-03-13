@@ -74,7 +74,7 @@ export default function Documents() {
     const role = u?.role;
     let myCompanies;
     if (role === "contador") {
-      myCompanies = comps.filter(c => c.contadorEmail === u.email || c.contador_responsavel === u.email);
+      myCompanies = comps.filter(c => c.contadorEmail === u.email);
     } else if (role === "empresa") {
       myCompanies = comps.filter(c => c.email === u.email);
     } else {
