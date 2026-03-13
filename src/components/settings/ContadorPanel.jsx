@@ -310,8 +310,9 @@ export default function ContadorPanel({ user }) {
                   )}
                   <div className="p-4 flex items-center gap-3 relative">
                     <div className={`w-11 h-11 rounded-xl flex items-center justify-center text-base font-black flex-shrink-0 transition-all shadow-sm ${isActive
-                      ? "bg-gradient-to-br from-blue-500 to-indigo-600 text-white shadow-blue-500/30"
-                      : "bg-slate-100 text-slate-600"}`}>
+                       ? "bg-gradient-to-br from-cyan-500 to-blue-600 text-white shadow-cyan-500/30"
+                       : "text-slate-300"}`}
+                      style={!isActive ? { background: "rgba(255,255,255,0.08)" } : {}}>
                       {c.razao_social?.[0]?.toUpperCase()}
                     </div>
                     <div className="min-w-0 flex-1">
