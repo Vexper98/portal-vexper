@@ -57,6 +57,7 @@ const AuthenticatedApp = () => {
         />
       ))}
       <Route path="/FiscalSchedule" element={<LayoutWrapper currentPageName="FiscalSchedule"><FiscalSchedule /></LayoutWrapper>} />
+      <Route path="/FiscalCalendar" element={<LayoutWrapper currentPageName="FiscalCalendar"><FiscalCalendar /></LayoutWrapper>} />
       <Route path="*" element={<PageNotFound />} />
     </Routes>
   );
