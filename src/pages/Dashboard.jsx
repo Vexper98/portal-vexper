@@ -44,7 +44,10 @@ export default function Dashboard() {
 
   useEffect(() => {
     load();
-    const interval = setInterval(load, 30000);
+    const interval = setInterval(() => {
+      setSyncing(true);
+      load();
+    }, 10000);
     return () => clearInterval(interval);
   }, [load]);
 
@@ -136,6 +139,16 @@ export default function Dashboard() {
               <div className="flex items-center gap-2 mb-1">
                 <motion.div className="w-1.5 h-1.5 rounded-full bg-green-400" animate={{ opacity: [1, 0.3, 1] }} transition={{ duration: 2, repeat: Infinity }} />
                 <span className="text-[10px] text-green-400 font-semibold uppercase tracking-[0.2em]">Sistema Online</span>
+                <span className="text-[10px] text-slate-600 font-mono">·</span>
+                {syncing ? (
+                  <span className="flex items-center gap-1 text-[10px] text-cyan-500 font-mono">
+                    <RefreshCw className="w-2.5 h-2.5 animate-spin" /> Sincronizando...
+                  </span>
+                ) : lastSync && (
+                  <span className="text-[10px] text-slate-600 font-mono">
+                    Sync {lastSync.toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit", second: "2-digit" })}
+                  </span>
+                )}
               </div>
               <h1 className="text-2xl font-bold text-white tracking-tight">Dashboard <span className="text-cyan-400">Fiscal</span></h1>
               <p className="text-slate-400 text-xs mt-0.5">{companies.length} empresas · {documents.length} documentos</p>
