@@ -285,9 +285,10 @@ export default function ContadorPanel({ user }) {
               <AnimatePresence>
                 {selected.length > 0 && (
                   <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.9 }}>
-                    <Button size="sm" onClick={downloadSelected}
+                    <Button size="sm" onClick={downloadSelected} disabled={downloading}
                       className="bg-gradient-to-r from-blue-600 to-cyan-600 text-white border-0 hover:opacity-90 shadow-md shadow-blue-500/20 rounded-xl">
-                      <FileDown className="w-3.5 h-3.5 mr-1.5" /> Baixar {selected.length} arquivo(s)
+                      {downloading ? <RefreshCw className="w-3.5 h-3.5 mr-1.5 animate-spin" /> : <FileDown className="w-3.5 h-3.5 mr-1.5" />}
+                      {downloading ? "Baixando..." : `Baixar ${selected.length} arquivo(s)`}
                     </Button>
                   </motion.div>
                 )}
