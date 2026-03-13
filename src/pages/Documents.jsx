@@ -76,7 +76,7 @@ export default function Documents() {
     if (role === "contador") {
       myCompanies = comps.filter(c => c.contadorEmail === u.email || c.contador_responsavel === u.email);
     } else if (role === "empresa") {
-      myCompanies = comps.filter(c => c.created_by === u.email);
+      myCompanies = comps.filter(c => c.email === u.email || c.contadorEmail === u.email);
     } else {
       myCompanies = comps; // admin / suporte veem tudo
     }
