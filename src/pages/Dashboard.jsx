@@ -81,7 +81,7 @@ export default function Dashboard() {
   }
 
   return (
-    <div className="space-y-5 min-h-screen" style={{ background: "transparent" }}>
+    <div className="space-y-5 min-h-screen -m-4 lg:-m-8 p-4 lg:p-8" style={{ background: "linear-gradient(160deg, #060d1f 0%, #070f20 60%, #040c1a 100%)" }}>
 
       {/* HERO BANNER */}
       <motion.div
