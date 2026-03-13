@@ -205,7 +205,7 @@ export default function Documents() {
           <h1 className="text-2xl font-bold text-slate-900">Documentos Fiscais</h1>
           <p className="text-sm text-slate-500 mt-1">
             {documents.length} documentos · {filtered.length} exibidos
-            {selected.size > 0 && ` · ${selected.size} selecionados`}
+            {selected.size > 0 && ` · ${filtered.filter(d => selected.has(d.id)).length} selecionados`}
           </p>
         </div>
         <div className="flex gap-2">
