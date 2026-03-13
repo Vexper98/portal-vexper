@@ -73,17 +73,20 @@ export default function Documents() {
     ]);
     const role = u?.role;
     let myCompanies;
+    let myDocs;
     if (role === "contador") {
       myCompanies = comps.filter(c => c.contadorEmail === u.email);
+      const myIds = new Set(myCompanies.map(c => c.id));
+      myDocs = docs.filter(d => myIds.has(d.companyId));
     } else if (role === "empresa") {
-      myCompanies = comps.filter(c => c.email === u.email);
+      // empresa só vê documentos que ela mesma enviou
+      myDocs = docs.filter(d => d.created_by === u.email);
+      const myIds = new Set(myDocs.map(d => d.companyId));
+      myCompanies = comps.filter(c => myIds.has(c.id));
     } else {
       myCompanies = comps; // admin / suporte veem tudo
+      myDocs = docs;
     }
-    const myIds = new Set(myCompanies.map(c => c.id));
-    const myDocs = (role === "contador" || role === "empresa")
-      ? docs.filter(d => myIds.has(d.companyId))
-      : docs;
     setDocuments(myDocs);
     setCompanies(myCompanies);
     const map = {};
