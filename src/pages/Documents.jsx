@@ -112,14 +112,23 @@ export default function Documents() {
     URL.revokeObjectURL(blobUrl);
   };
 
+  const [downloading, setDownloading] = useState(false);
+
   const handleBulkDownload = async () => {
     if (selected.size === 0) return;
+    setDownloading(true);
     const selectedDocs = documents.filter(d => selected.has(d.id));
     const zip = new JSZip();
-    selectedDocs.forEach(doc => {
-      const content = doc.xmlContent || "";
-      zip.file(doc.filename || `${doc.id}.xml`, content);
-    });
+    await Promise.all(selectedDocs.map(async (doc) => {
+      const fname = doc.originalFilename || doc.filename || `${doc.id}.xml`;
+      if (doc.fileUrl) {
+        const res = await fetch(doc.fileUrl);
+        const blob = await res.blob();
+        zip.file(fname, blob);
+      } else if (doc.xmlContent) {
+        zip.file(fname, doc.xmlContent);
+      }
+    }));
     const blob = await zip.generateAsync({ type: "blob" });
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
@@ -129,6 +138,7 @@ export default function Documents() {
     a.click();
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
+    setDownloading(false);
   };
 
   const handleDownloadOriginal = (doc) => {
@@ -203,8 +213,9 @@ export default function Documents() {
             <RefreshCw className="w-4 h-4" />
           </Button>
           {selected.size > 0 && (
-            <Button onClick={handleBulkDownload} className="bg-blue-600 hover:bg-blue-700">
-              <PackageOpen className="w-4 h-4 mr-2" /> Baixar {selected.size} arquivo(s)
+            <Button onClick={handleBulkDownload} disabled={downloading} className="bg-blue-600 hover:bg-blue-700">
+              <PackageOpen className="w-4 h-4 mr-2" />
+              {downloading ? "Preparando..." : `Baixar ${selected.size} arquivo(s)`}
             </Button>
           )}
         </div>
