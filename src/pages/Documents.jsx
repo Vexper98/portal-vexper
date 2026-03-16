@@ -263,6 +263,58 @@ export default function Documents() {
         </div>
       </div>
 
+      {/* Admin: Backup por Empresa */}
+      {user?.role === "admin" && companies.length > 0 && (
+        <Card className="border-0 shadow-sm">
+          <CardContent className="p-4">
+            <div className="flex items-center gap-2 mb-3">
+              <HardDrive className="w-4 h-4 text-cyan-400" />
+              <span className="text-sm font-semibold text-slate-200">Backup / Limpeza por Empresa</span>
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
+              {companies.map(c => {
+                const count = documents.filter(d => d.companyId === c.id).length;
+                const isLoading = backupCompanyId === c.id;
+                return (
+                  <div key={c.id} className="flex items-center justify-between p-2.5 rounded-lg border border-white/10 bg-white/3">
+                    <div className="flex items-center gap-2 min-w-0">
+                      <Building2 className="w-3.5 h-3.5 text-slate-500 flex-shrink-0" />
+                      <div className="min-w-0">
+                        <p className="text-xs font-medium text-slate-200 truncate">{c.nome_fantasia || c.razao_social}</p>
+                        <p className="text-[10px] text-slate-500">{count} docs</p>
+                      </div>
+                    </div>
+                    <div className="flex gap-1 flex-shrink-0 ml-2">
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        className="h-7 px-2 text-xs border-cyan-800 text-cyan-400 hover:bg-cyan-900/30"
+                        onClick={() => handleBackupByCompany(c.id)}
+                        disabled={isLoading || count === 0}
+                        title="Baixar ZIP com todos os documentos"
+                      >
+                        {isLoading ? <RefreshCw className="w-3 h-3 animate-spin" /> : <Download className="w-3 h-3" />}
+                        <span className="ml-1">ZIP</span>
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        className="h-7 px-2 text-xs border-red-800 text-red-400 hover:bg-red-900/30"
+                        onClick={() => setDeleteCompanyTarget(c)}
+                        disabled={count === 0}
+                        title="Apagar todos os documentos desta empresa"
+                      >
+                        <Trash2 className="w-3 h-3" />
+                      </Button>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
       {/* Filters */}
       <Card className="border-0 shadow-sm">
         <CardContent className="p-4 space-y-3">
