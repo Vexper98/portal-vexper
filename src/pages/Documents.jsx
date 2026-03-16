@@ -71,6 +71,7 @@ export default function Documents() {
       base44.entities.Document.list("-created_date", 500),
       base44.entities.Company.list("-created_date", 200),
     ]);
+    setUser(u);
     const role = u?.role;
     let myCompanies;
     let myDocs;
