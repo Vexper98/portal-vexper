@@ -178,11 +178,8 @@ export default function FiscalCalendar() {
                   key={day.toISOString()}
                   onClick={() => {
                     setSelectedDay(isSelected ? null : day);
-                    if (canCreate && daySchedules.length === 0) {
-                      // show "+" hint but don't auto-open
-                    }
+                    if (canCreate) openCreateModal(day);
                   }}
-                  onDoubleClick={() => canCreate && openCreateModal(day)}
                   className={`relative aspect-square rounded-xl flex flex-col items-center justify-start pt-1.5 transition-all text-sm font-medium group
                     ${isSelected ? "bg-cyan-500/20 border border-cyan-500/40 text-cyan-300" :
                       isToday ? "border text-white" : "text-slate-400 hover:bg-white/5 hover:text-white border border-transparent"}
@@ -201,13 +198,9 @@ export default function FiscalCalendar() {
                     </div>
                   )}
                   {canCreate && (
-                    <span
-                      className="absolute top-0.5 right-0.5 text-cyan-500 opacity-0 group-hover:opacity-60 transition-opacity text-[10px] leading-none"
-                      onClick={e => { e.stopPropagation(); openCreateModal(day); }}
-                      title="Agendar compromisso"
-                    >
+                    <div className="absolute top-0.5 right-0.5 text-cyan-500 opacity-0 group-hover:opacity-60 transition-opacity">
                       <Plus className="w-3 h-3" />
-                    </span>
+                    </div>
                   )}
                 </button>
               );
