@@ -74,7 +74,20 @@ export default function CompanyFormDialog({ open, onOpenChange, company, onSave,
             </div>
             <div className="space-y-1.5">
               <Label>CNPJ *</Label>
-              <Input value={form.cnpj} onChange={e => handleChange("cnpj", e.target.value)} required placeholder="00.000.000/0000-00" />
+              <div className="flex gap-2">
+                <Input
+                  value={form.cnpj}
+                  onChange={e => { handleChange("cnpj", e.target.value); setCnpjError(""); }}
+                  onBlur={buscarCnpj}
+                  required
+                  placeholder="00.000.000/0000-00"
+                  className="flex-1"
+                />
+                <Button type="button" variant="outline" onClick={buscarCnpj} disabled={loadingCnpj} className="px-3 flex-shrink-0">
+                  {loadingCnpj ? <Loader2 className="w-4 h-4 animate-spin" /> : <Search className="w-4 h-4" />}
+                </Button>
+              </div>
+              {cnpjError && <p className="text-xs text-red-400">{cnpjError}</p>}
             </div>
             <div className="space-y-1.5">
               <Label>Inscrição Estadual</Label>
