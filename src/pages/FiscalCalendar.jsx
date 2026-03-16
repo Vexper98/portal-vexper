@@ -63,9 +63,22 @@ export default function FiscalCalendar() {
     setCompanies(data || []);
   };
 
-  const loadSchedules = async () => {
-    const data = await base44.entities.FiscalSchedule.list("-data_limite", 200);
-    setSchedules(data);
+  const loadSchedules = async (u) => {
+    const currentUser = u || user;
+    if (!currentUser) return;
+    let data;
+    if (currentUser.role === "admin") {
+      data = await base44.entities.FiscalSchedule.list("-data_limite", 200);
+    } else if (currentUser.role === "contador") {
+      data = await base44.entities.FiscalSchedule.filter({ contador_email: currentUser.email }, "-data_limite", 200);
+    } else {
+      // empresa: vê schedules das suas empresas
+      const myCompanies = await base44.entities.Company.filter({ email: currentUser.email });
+      const myIds = new Set(myCompanies.map(c => c.id));
+      const all = await base44.entities.FiscalSchedule.list("-data_limite", 200);
+      data = all.filter(s => myIds.has(s.company_id));
+    }
+    setSchedules(data || []);
   };
 
   const days = eachDayOfInterval({ start: startOfMonth(currentMonth), end: endOfMonth(currentMonth) });
