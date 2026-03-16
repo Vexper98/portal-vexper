@@ -275,11 +275,20 @@ export default function Settings() {
     load();
   }, []);
 
+  const [editPlan, setEditPlan] = useState("free");
+  const [editProEnabled, setEditProEnabled] = useState(false);
+  const [editBlocked, setEditBlocked] = useState(false);
+
   const handleEditRole = async () => {
     if (!editRoleUser || !editRoleValue) return;
     setSavingRole(true);
-    await base44.entities.User.update(editRoleUser.id, { role: editRoleValue });
-    toast.success(`Perfil de ${editRoleUser.full_name || editRoleUser.email} atualizado`);
+    await base44.entities.User.update(editRoleUser.id, {
+      role: editRoleValue,
+      plan: editPlan,
+      pro_enabled: editProEnabled,
+      blocked: editBlocked,
+    });
+    toast.success(`Usuário ${editRoleUser.full_name || editRoleUser.email} atualizado`);
     setSavingRole(false);
     setEditRoleUser(null);
     const u = await base44.entities.User.list("-created_date", 100);
