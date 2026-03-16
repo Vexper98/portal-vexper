@@ -161,7 +161,6 @@ function AdminPanel({ users, onInvite, onEditRole }) {
         </div>
 
         <div className="divide-y divide-slate-50/80 px-2 py-2">
-          <AnimatePresence>
             {users.map((u, i) => (
               <motion.div key={u.id}
                 initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: i * 0.05 }}
