@@ -69,11 +69,18 @@ export default function FiscalCalendar() {
     } else if (currentUser.role === "contador") {
       data = await base44.entities.FiscalSchedule.filter({ contador_email: currentUser.email }, "-data_limite", 200);
     } else {
-      // empresa: vê schedules das suas empresas
-      const myCompanies = await base44.entities.Company.filter({ email: currentUser.email });
-      const myIds = new Set(myCompanies.map(c => c.id));
-      const all = await base44.entities.FiscalSchedule.list("-data_limite", 200);
-      data = all.filter(s => myIds.has(s.company_id));
+      // empresa: vê schedules das suas empresas (vinculadas por email ou created_by)
+      const [byEmail, byCreator] = await Promise.all([
+        base44.entities.Company.filter({ email: currentUser.email }),
+        base44.entities.Company.filter({ created_by: currentUser.email }),
+      ]);
+      const allCompanies = [...byEmail, ...byCreator];
+      const myIds = new Set(allCompanies.map(c => c.id));
+      if (myIds.size === 0) { data = []; }
+      else {
+        const all = await base44.entities.FiscalSchedule.list("-data_limite", 200);
+        data = all.filter(s => myIds.has(s.company_id));
+      }
     }
     setSchedules(data || []);
   };
