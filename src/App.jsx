@@ -9,6 +9,9 @@ import UserNotRegisteredError from '@/components/UserNotRegisteredError';
 import LoadingScreen from '@/components/LoadingScreen';
 import FiscalSchedule from './pages/FiscalSchedule';
 import FiscalCalendar from './pages/FiscalCalendar';
+import TaxGuides from './pages/TaxGuides';
+import ContasAPagar from './pages/ContasAPagar';
+import ContasAReceber from './pages/ContasAReceber';
 
 const { Pages, Layout, mainPage } = pagesConfig;
 const mainPageKey = mainPage ?? Object.keys(Pages)[0];
