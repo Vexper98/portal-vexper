@@ -386,17 +386,39 @@ export default function Settings() {
           </DialogHeader>
           <div className="py-2 space-y-3">
             <div className="space-y-1.5">
-              <Label className="text-xs font-bold text-slate-600 uppercase tracking-wide">Novo Perfil</Label>
+              <Label className="text-xs font-bold text-slate-600 uppercase tracking-wide">Perfil</Label>
               <Select value={editRoleValue} onValueChange={setEditRoleValue}>
                 <SelectTrigger className="rounded-xl border-slate-200 h-10"><SelectValue /></SelectTrigger>
                 <SelectContent>
                   <SelectItem value="admin">🔴 Administrador</SelectItem>
-                  <SelectItem value="contador">🔵 Contador</SelectItem>
+                  <SelectItem value="common_user">🔵 Contador (novo)</SelectItem>
+                  <SelectItem value="contador">🔵 Contador (legado)</SelectItem>
                   <SelectItem value="empresa">🟢 Empresa</SelectItem>
                   <SelectItem value="suporte">🟣 Suporte</SelectItem>
-                  <SelectItem value="user">⚪ Usuário padrão</SelectItem>
                 </SelectContent>
               </Select>
+            </div>
+            <div className="space-y-1.5">
+              <Label className="text-xs font-bold text-slate-600 uppercase tracking-wide">Plano</Label>
+              <Select value={editPlan} onValueChange={setEditPlan}>
+                <SelectTrigger className="rounded-xl border-slate-200 h-10"><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="free">Free</SelectItem>
+                  <SelectItem value="pro_contador">⭐ ProContador</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="flex items-center gap-4">
+              <label className="flex items-center gap-2 cursor-pointer">
+                <input type="checkbox" checked={editProEnabled} onChange={e => setEditProEnabled(e.target.checked)}
+                  className="rounded accent-amber-500" />
+                <span className="text-sm text-slate-600 flex items-center gap-1"><Sparkles className="w-3.5 h-3.5 text-amber-500" /> Ativar PRO</span>
+              </label>
+              <label className="flex items-center gap-2 cursor-pointer">
+                <input type="checkbox" checked={editBlocked} onChange={e => setEditBlocked(e.target.checked)}
+                  className="rounded accent-red-500" />
+                <span className="text-sm text-slate-600 flex items-center gap-1"><Ban className="w-3.5 h-3.5 text-red-500" /> Bloquear</span>
+              </label>
             </div>
           </div>
           <DialogFooter className="gap-2 pt-2">
