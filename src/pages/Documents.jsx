@@ -502,6 +502,24 @@ export default function Documents() {
         onDownload={handleDownload}
       />
 
+      {/* Delete all by company */}
+      <AlertDialog open={!!deleteCompanyTarget} onOpenChange={() => setDeleteCompanyTarget(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Apagar todos os documentos?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Isso irá excluir <strong>{documents.filter(d => d.companyId === deleteCompanyTarget?.id).length} documentos</strong> da empresa <strong>{deleteCompanyTarget?.nome_fantasia || deleteCompanyTarget?.razao_social}</strong>. Esta ação é irreversível.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+            <AlertDialogAction onClick={handleDeleteAllByCompany} disabled={deletingCompany} className="bg-red-600 hover:bg-red-700">
+              {deletingCompany ? "Apagando..." : "Apagar Tudo"}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
       <AlertDialog open={!!deleteTarget} onOpenChange={() => setDeleteTarget(null)}>
         <AlertDialogContent>
           <AlertDialogHeader>
