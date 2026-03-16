@@ -97,18 +97,51 @@ export default function Layout({ children, currentPageName }) {
 
         {/* Nav */}
         <nav className="flex-1 px-3 py-4 space-y-0.5 overflow-y-auto">
+          {/* PRO badge for common_user */}
+          {isCommonUser && (
+            <div className="mb-3 px-2">
+              {userIsPro ? (
+                <div className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl" style={{ background: "rgba(251,191,36,0.08)", border: "1px solid rgba(251,191,36,0.15)" }}>
+                  <Sparkles className="w-3 h-3 text-amber-400" />
+                  <span className="text-[10px] font-bold text-amber-300 uppercase tracking-wider">ProContador Ativo</span>
+                </div>
+              ) : (
+                <button className="w-full flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl transition-colors hover:bg-amber-500/10"
+                  style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)" }}
+                  onClick={() => setUpgradeModal(true)}>
+                  <Lock className="w-3 h-3 text-slate-500" />
+                  <span className="text-[10px] text-slate-500 uppercase tracking-wider">Plano Free</span>
+                  <span className="ml-auto text-[9px] font-bold text-amber-400">Assinar PRO →</span>
+                </button>
+              )}
+            </div>
+          )}
+
           {filteredNav.map((item) => {
             const itemPath = item.path || `/${item.page}`;
             const isActive = location.pathname === itemPath || location.pathname === `/${item.page}`;
+            const isLocked = isCommonUser && item.premium && !userIsPro;
+
+            if (isLocked) {
+              return (
+                <button key={item.name + item.page}
+                  className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all group relative text-slate-600 hover:text-slate-500 cursor-pointer"
+                  style={{ border: "1px solid transparent" }}
+                  onClick={() => setUpgradeModal(true)}>
+                  <item.icon className="w-[17px] h-[17px] flex-shrink-0 text-slate-700" />
+                  <span className="truncate">{item.name}</span>
+                  <Lock className="ml-auto w-3 h-3 text-amber-600/60 flex-shrink-0" />
+                </button>
+              );
+            }
+
             return (
               <Link
                 key={item.name + item.page}
                 to={item.path || `/${item.page}`}
                 onClick={() => setSidebarOpen(false)}
                 className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 group relative ${
-                  isActive
-                    ? "text-cyan-300"
-                    : "text-slate-500 hover:text-slate-200"
+                  isActive ? "text-cyan-300" : "text-slate-500 hover:text-slate-200"
                 }`}
                 style={isActive ? { background: "rgba(6,182,212,0.1)", border: "1px solid rgba(6,182,212,0.15)" } : { border: "1px solid transparent" }}
               >
@@ -126,6 +159,7 @@ export default function Layout({ children, currentPageName }) {
             );
           })}
         </nav>
+        <UpgradeModal open={upgradeModal} onClose={() => setUpgradeModal(false)} />
 
         {/* User section */}
         {user && (
