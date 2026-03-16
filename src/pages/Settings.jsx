@@ -18,11 +18,12 @@ import ContadorPanel from "../components/settings/ContadorPanel";
 const roleBadge = {
   admin: "bg-red-500/15 text-red-500 border-red-500/30",
   contador: "bg-blue-500/15 text-blue-600 border-blue-500/30",
+  common_user: "bg-cyan-500/15 text-cyan-400 border-cyan-500/30",
   empresa: "bg-emerald-500/15 text-emerald-600 border-emerald-500/30",
   suporte: "bg-purple-500/15 text-purple-600 border-purple-500/30",
 };
-const roleLabel = { admin: "Administrador", contador: "Contador", empresa: "Empresa", suporte: "Suporte" };
-const roleIcon = { admin: "🔴", contador: "🔵", empresa: "🟢", suporte: "🟣" };
+const roleLabel = { admin: "Administrador", contador: "Contador", common_user: "Contador", empresa: "Empresa", suporte: "Suporte" };
+const roleIcon = { admin: "🔴", contador: "🔵", common_user: "🔵", empresa: "🟢", suporte: "🟣" };
 
 const roleAvatarGradient = {
   admin: "from-red-500 to-rose-600",
