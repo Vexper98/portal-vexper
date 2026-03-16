@@ -184,7 +184,6 @@ function AdminPanel({ users, onInvite, onEditRole }) {
                 </motion.div>
               </motion.div>
             ))}
-          </AnimatePresence>
         </div>
       </motion.div>
 
