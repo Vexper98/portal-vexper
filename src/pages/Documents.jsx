@@ -161,6 +161,39 @@ export default function Documents() {
     triggerDownload(doc.fileUrl, doc.originalFilename || doc.filename || `${doc.id}.xml`);
   };
 
+  const handleBackupByCompany = async (companyId) => {
+    setBackupCompanyId(companyId);
+    const company = companiesMap[companyId];
+    const companyDocs = documents.filter(d => d.companyId === companyId);
+    const zip = new JSZip();
+    await Promise.all(companyDocs.map(async (doc) => {
+      const fname = doc.originalFilename || doc.filename || `${doc.id}.xml`;
+      if (doc.fileUrl) {
+        const res = await fetch(doc.fileUrl);
+        const blob = await res.blob();
+        zip.file(fname, blob);
+      } else if (doc.xmlContent) {
+        zip.file(fname, doc.xmlContent);
+      }
+    }));
+    const blob = await zip.generateAsync({ type: "blob" });
+    const url = URL.createObjectURL(blob);
+    const companyName = (company?.nome_fantasia || company?.razao_social || companyId).replace(/[^a-zA-Z0-9]/g, "_");
+    triggerDownload(url, `backup_${companyName}_${format(new Date(), "yyyyMMdd")}.zip`);
+    setTimeout(() => URL.revokeObjectURL(url), 200);
+    setBackupCompanyId(null);
+  };
+
+  const handleDeleteAllByCompany = async () => {
+    if (!deleteCompanyTarget) return;
+    setDeletingCompany(true);
+    const companyDocs = documents.filter(d => d.companyId === deleteCompanyTarget.id);
+    await Promise.all(companyDocs.map(d => base44.entities.Document.delete(d.id)));
+    setDeleteCompanyTarget(null);
+    setDeletingCompany(false);
+    loadData();
+  };
+
   const copyKey = (key, id) => {
     navigator.clipboard.writeText(key);
     setCopiedKey(id);
