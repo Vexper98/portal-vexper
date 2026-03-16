@@ -166,17 +166,31 @@ function AdminPanel({ users, onInvite, onEditRole }) {
             {users.map((u, i) => (
               <motion.div key={u.id}
                 initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: i * 0.05 }}
-                className="flex items-center gap-4 px-4 py-3 rounded-2xl hover:bg-slate-50/80 transition-all group cursor-default">
+                className={`flex items-center gap-4 px-4 py-3 rounded-2xl hover:bg-slate-50/80 transition-all group cursor-default ${u.blocked ? "opacity-50" : ""}`}>
                 <div className={`w-10 h-10 rounded-xl bg-gradient-to-br ${roleAvatarGradient[u.role] || "from-slate-400 to-slate-500"} flex items-center justify-center text-sm font-bold text-white flex-shrink-0 shadow-sm`}>
                   {u.full_name?.[0]?.toUpperCase() || u.email?.[0]?.toUpperCase() || "?"}
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="text-sm font-semibold text-slate-800 truncate">{u.full_name || "—"}</p>
+                  <div className="flex items-center gap-2">
+                    <p className="text-sm font-semibold text-slate-800 truncate">{u.full_name || "—"}</p>
+                    {u.blocked && <Badge className="text-[9px] bg-red-100 text-red-600 border-red-200 px-1.5 py-0">Bloqueado</Badge>}
+                  </div>
                   <p className="text-xs text-slate-400 truncate">{u.email}</p>
                 </div>
-                <Badge variant="outline" className={`text-[10px] font-bold px-2.5 py-0.5 ${roleBadge[u.role] || "bg-slate-100 text-slate-500"}`}>
-                  {roleIcon[u.role]} {roleLabel[u.role] || u.role}
-                </Badge>
+                <div className="flex items-center gap-2">
+                  <Badge variant="outline" className={`text-[10px] font-bold px-2.5 py-0.5 ${roleBadge[u.role] || "bg-slate-100 text-slate-500"}`}>
+                    {roleIcon[u.role]} {roleLabel[u.role] || u.role}
+                  </Badge>
+                  {u.plan === "pro_contador" || u.pro_enabled ? (
+                    <Badge className="text-[9px] bg-amber-100 text-amber-700 border-amber-200 px-1.5 py-0 gap-0.5">
+                      ⭐ PRO
+                    </Badge>
+                  ) : (u.role === "common_user" || u.role === "contador") ? (
+                    <Badge className="text-[9px] bg-slate-100 text-slate-500 border-slate-200 px-1.5 py-0">
+                      Free
+                    </Badge>
+                  ) : null}
+                </div>
                 <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }}>
                   <Button size="icon" variant="ghost"
                     className="h-8 w-8 opacity-0 group-hover:opacity-100 transition-opacity rounded-xl hover:bg-blue-50 hover:text-blue-600"
