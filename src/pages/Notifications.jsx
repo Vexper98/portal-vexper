@@ -21,8 +21,15 @@ export default function Notifications() {
 
   useEffect(() => {
     const load = async () => {
-      const notifs = await base44.entities.Notification.list("-created_date", 100);
-      setNotifications(notifs);
+      const u = await base44.auth.me().catch(() => null);
+      if (!u) { setLoading(false); return; }
+      let notifs;
+      if (u.role === "admin") {
+        notifs = await base44.entities.Notification.list("-created_date", 100);
+      } else {
+        notifs = await base44.entities.Notification.filter({ destinatario: u.email }, "-created_date", 100);
+      }
+      setNotifications(notifs || []);
       setLoading(false);
     };
     load();
