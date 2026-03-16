@@ -43,12 +43,9 @@ export default function FiscalCalendar() {
     base44.auth.me().then(u => {
       setUser(u);
       loadCompanies(u);
+      loadSchedules(u);
     }).catch(() => {});
   }, []);
-
-  useEffect(() => {
-    if (user) loadSchedules();
-  }, [user]);
 
   const loadCompanies = async (u) => {
     if (!u) return;
