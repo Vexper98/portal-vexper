@@ -5,6 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Loader2, Search } from "lucide-react";
 
 const STATES = ["AC","AL","AM","AP","BA","CE","DF","ES","GO","MA","MG","MS","MT","PA","PB","PE","PI","PR","RJ","RN","RO","RR","RS","SC","SE","SP","TO"];
 
@@ -14,8 +15,41 @@ export default function CompanyFormDialog({ open, onOpenChange, company, onSave,
     endereco: "", cidade: "", estado: "", cep: "", telefone: "", email: "",
     contador_responsavel: "", contadorEmail: "", pasta_sincronizacao: "", status: "ativa", observacoes: ""
   });
+  const [loadingCnpj, setLoadingCnpj] = useState(false);
+  const [cnpjError, setCnpjError] = useState("");
 
   const handleChange = (field, value) => setForm(prev => ({ ...prev, [field]: value }));
+
+  const buscarCnpj = async () => {
+    const cnpjLimpo = form.cnpj.replace(/\D/g, "");
+    if (cnpjLimpo.length !== 14) { setCnpjError("CNPJ deve ter 14 dígitos"); return; }
+    setCnpjError("");
+    setLoadingCnpj(true);
+    try {
+      const res = await fetch(`https://publica.cnpj.ws/cnpj/${cnpjLimpo}`);
+      if (!res.ok) throw new Error("CNPJ não encontrado");
+      const data = await res.json();
+      const end = data.estabelecimento;
+      const logradouro = [end.tipo_logradouro, end.logradouro, end.numero, end.complemento].filter(Boolean).join(" ");
+      const uf = end.estado?.sigla || "";
+      const telefone = end.ddd1 && end.telefone1 ? `(${end.ddd1}) ${end.telefone1}` : "";
+      setForm(prev => ({
+        ...prev,
+        razao_social: data.razao_social || prev.razao_social,
+        nome_fantasia: end.nome_fantasia || prev.nome_fantasia,
+        cnpj: `${cnpjLimpo.slice(0,2)}.${cnpjLimpo.slice(2,5)}.${cnpjLimpo.slice(5,8)}/${cnpjLimpo.slice(8,12)}-${cnpjLimpo.slice(12)}`,
+        endereco: logradouro || prev.endereco,
+        cidade: end.cidade?.nome || prev.cidade,
+        estado: uf || prev.estado,
+        cep: end.cep ? end.cep.replace(/\D/g, "").replace(/(\d{5})(\d{3})/, "$1-$2") : prev.cep,
+        telefone: telefone || prev.telefone,
+        email: end.email || prev.email,
+      }));
+    } catch (e) {
+      setCnpjError("CNPJ não encontrado ou inválido");
+    }
+    setLoadingCnpj(false);
+  };
 
   const handleSubmit = (e) => {
     e.preventDefault();
