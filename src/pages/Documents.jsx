@@ -128,6 +128,10 @@ export default function Documents() {
   };
 
   const [downloading, setDownloading] = useState(false);
+  const [user, setUser] = useState(null);
+  const [backupCompanyId, setBackupCompanyId] = useState(null);
+  const [deleteCompanyTarget, setDeleteCompanyTarget] = useState(null);
+  const [deletingCompany, setDeletingCompany] = useState(false);
 
   const handleBulkDownload = async () => {
     if (selected.size === 0) return;
