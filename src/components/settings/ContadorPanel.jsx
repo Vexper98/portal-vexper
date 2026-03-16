@@ -188,25 +188,54 @@ export default function ContadorPanel({ user }) {
     { label: "Clientes", value: companies.length, color: "text-cyan-400", bg: "from-cyan-500 to-blue-500", glow: "shadow-cyan-500/30" },
   ];
 
+  // Chart data
+  const docsByType = [
+    { name: "NF-e", value: nfe, color: "#3b82f6" },
+    { name: "NFC-e", value: nfce, color: "#10b981" },
+    { name: "XML", value: xml, color: "#64748b" },
+  ].filter(d => d.value > 0);
+
+  // docs por empresa (top 5)
+  const docsByCompany = companies.slice(0, 5).map(c => ({
+    name: c.razao_social?.slice(0, 12) + (c.razao_social?.length > 12 ? "…" : ""),
+    docs: documents.filter(d => d.companyId === c.id).length,
+  }));
+
   const moduleCards = [
     {
       label: "Guias Pendentes", value: userIsPro ? pendingGuides : "—",
       icon: Receipt, color: "from-amber-500 to-orange-500", isPremium: !userIsPro,
+      img: "https://images.unsplash.com/photo-1554224155-6726b3ff858f?w=400&q=60",
       onClick: () => userIsPro ? navigate("/TaxGuides") : setUpgradeModal(true),
     },
     {
       label: "Contas a Pagar", value: userIsPro ? "Ver" : "—",
       icon: CreditCard, color: "from-red-500 to-rose-600", isPremium: !userIsPro,
+      img: "https://images.unsplash.com/photo-1563013544-824ae1b704d3?w=400&q=60",
       onClick: () => userIsPro ? navigate("/ContasAPagar") : setUpgradeModal(true),
     },
     {
       label: "Contas a Receber", value: userIsPro ? overdueAR + " atraso" : "—",
       icon: Banknote, color: "from-green-500 to-emerald-600", isPremium: !userIsPro,
+      img: "https://images.unsplash.com/photo-1579621970563-ebec7560ff3e?w=400&q=60",
       onClick: () => userIsPro ? navigate("/ContasAReceber") : setUpgradeModal(true),
     },
     {
-      label: "Mensalidades Atraso", value: userIsPro ? overdueAR : "—",
-      icon: AlertTriangle, color: "from-rose-500 to-red-600", isPremium: !userIsPro,
+      label: "Calendário Fiscal", value: userIsPro ? "Ver" : "—",
+      icon: CalendarCheck, color: "from-violet-500 to-purple-600", isPremium: !userIsPro,
+      img: "https://images.unsplash.com/photo-1506784365847-bbad939e9335?w=400&q=60",
+      onClick: () => userIsPro ? navigate("/FiscalCalendar") : setUpgradeModal(true),
+    },
+    {
+      label: "Relatórios", value: userIsPro ? "Ver" : "—",
+      icon: BarChart3, color: "from-blue-500 to-indigo-600", isPremium: !userIsPro,
+      img: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=400&q=60",
+      onClick: () => userIsPro ? navigate("/Reports") : setUpgradeModal(true),
+    },
+    {
+      label: "Alertas de Vencimento", value: userIsPro ? upcomingAR.length + " próximos" : "—",
+      icon: Bell, color: "from-rose-500 to-red-600", isPremium: !userIsPro,
+      img: "https://images.unsplash.com/photo-1586953208448-b95a79798f07?w=400&q=60",
       onClick: () => userIsPro ? navigate("/ContasAReceber") : setUpgradeModal(true),
     },
   ];
