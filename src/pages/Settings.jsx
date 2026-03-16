@@ -286,6 +286,10 @@ export default function Settings() {
     </div>
   );
 
+  const isCommonUser = currentUser?.role === "common_user";
+  if (isCommonUser) {
+    return <ContadorPanel user={currentUser} />;
+  }
   if (currentUser?.role !== "admin") {
     return <ContadorPanel user={currentUser} />;
   }
