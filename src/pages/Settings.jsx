@@ -321,7 +321,7 @@ export default function Settings() {
 
   return (
     <>
-      <AdminPanel users={users} onInvite={() => setInviteOpen(true)} onEditRole={(u) => { setEditRoleUser(u); setEditRoleValue(u.role || "empresa"); }} />
+      <AdminPanel users={users} onInvite={() => setInviteOpen(true)} onEditRole={(u) => { setEditRoleUser(u); setEditRoleValue(u.role || "common_user"); setEditPlan(u.plan || "free"); setEditProEnabled(u.pro_enabled || false); setEditBlocked(u.blocked || false); }} />
 
       {/* Invite Dialog */}
       <Dialog open={inviteOpen} onOpenChange={setInviteOpen}>
