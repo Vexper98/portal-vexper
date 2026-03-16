@@ -55,7 +55,13 @@ export default function FiscalCalendar() {
     } else if (u.role === "contador") {
       data = await base44.entities.Company.filter({ contadorEmail: u.email });
     } else {
-      data = await base44.entities.Company.filter({ email: u.email });
+      const [byEmail, byCreator] = await Promise.all([
+        base44.entities.Company.filter({ email: u.email }),
+        base44.entities.Company.filter({ created_by: u.email }),
+      ]);
+      const merged = [...byEmail, ...byCreator];
+      const unique = merged.filter((c, i, arr) => arr.findIndex(x => x.id === c.id) === i);
+      data = unique;
     }
     setCompanies(data || []);
   };
