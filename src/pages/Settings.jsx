@@ -11,7 +11,8 @@ import { toast } from "sonner";
 import { motion } from "framer-motion";
 import {
   Users, Shield, UserPlus, Cpu, Database, Zap,
-  CheckCircle, Pencil, TrendingUp, Activity, Lock, Globe
+  CheckCircle, Pencil, TrendingUp, Activity, Lock, Globe, Sparkles,
+  Ban, CheckCircle2
 } from "lucide-react";
 import ContadorPanel from "../components/settings/ContadorPanel";
 
