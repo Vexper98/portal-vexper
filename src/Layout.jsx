@@ -17,18 +17,30 @@ import { motion, AnimatePresence } from "framer-motion";
 const LOGO_URL = "https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/69b20f55fd3ef9a7984c9160/a79383218_logo.png";
 
 const NAV_ITEMS = [
-  { name: "Dashboard",      icon: LayoutDashboard, page: "Dashboard",      roles: ["admin", "contador", "suporte"] },
-  { name: "Empresas",       icon: Building2,       page: "Companies",      roles: ["admin", "contador", "suporte"] },
-  { name: "Documentos",     icon: FileText,        page: "Documents",      roles: ["admin", "contador", "suporte", "empresa"] },
-  { name: "Enviar Arquivos",icon: Upload,          page: "DocumentUpload", roles: ["admin", "contador", "empresa"] },
-  { name: "Notificações",   icon: Bell,            page: "Notifications",  roles: ["admin", "contador", "suporte", "empresa"] },
-  { name: "Relatórios",     icon: BarChart3,       page: "Reports",        roles: ["admin", "contador"] },
-  { name: "Meus Clientes",  icon: Users,           page: "MyClients",      roles: ["admin", "contador"] },
-  { name: "Meus Documentos",icon: Download,        page: "Settings",       roles: ["contador"] },
-  { name: "Cronograma",     icon: CalendarCheck,   page: "FiscalSchedule", path: "/FiscalSchedule", roles: ["admin"] },
-  { name: "Calendário Fiscal", icon: CalendarCheck, page: "FiscalCalendar", path: "/FiscalCalendar", roles: ["contador", "suporte", "empresa"] },
-  { name: "Agente Sync",    icon: Zap,             page: "SyncAgent",      roles: ["admin", "contador"] },
-  { name: "Configurações",  icon: Settings,        page: "Settings",       roles: ["admin"] },
+  { name: "Dashboard",         icon: LayoutDashboard, page: "Dashboard",      roles: ["admin", "contador", "suporte"] },
+  { name: "Empresas",          icon: Building2,       page: "Companies",      roles: ["admin", "contador", "suporte"] },
+  { name: "Documentos",        icon: FileText,        page: "Documents",      roles: ["admin", "contador", "suporte", "empresa"] },
+  { name: "Enviar Arquivos",   icon: Upload,          page: "DocumentUpload", roles: ["admin", "contador", "empresa"] },
+  { name: "Notificações",      icon: Bell,            page: "Notifications",  roles: ["admin", "contador", "suporte", "empresa"] },
+  { name: "Relatórios",        icon: BarChart3,       page: "Reports",        roles: ["admin", "contador"] },
+  { name: "Meus Clientes",     icon: Users,           page: "MyClients",      roles: ["admin", "contador"] },
+  { name: "Cronograma",        icon: CalendarCheck,   page: "FiscalSchedule", path: "/FiscalSchedule", roles: ["admin"] },
+  { name: "Calendário Fiscal", icon: CalendarCheck,   page: "FiscalCalendar", path: "/FiscalCalendar", roles: ["contador", "suporte", "empresa"] },
+  { name: "Agente Sync",       icon: Zap,             page: "SyncAgent",      roles: ["admin", "contador"] },
+  { name: "Configurações",     icon: Settings,        page: "Settings",       roles: ["admin"] },
+];
+
+// Menu exclusivo para common_user (contador)
+const COMMON_USER_NAV = [
+  { name: "Dashboard",         icon: LayoutDashboard, page: "Settings",        premium: false },
+  { name: "Documentos",        icon: FileText,        page: "Settings",        premium: false, hash: "#docs" },
+  { name: "Empresas",          icon: Building2,       page: "Companies",       premium: false },
+  { name: "Guia de Impostos",  icon: Receipt,         page: "TaxGuides",       premium: true },
+  { name: "Contas a Pagar",    icon: CreditCard,      page: "ContasAPagar",    premium: true },
+  { name: "Contas a Receber",  icon: Banknote,        page: "ContasAReceber",  premium: true },
+  { name: "Calendário Fiscal", icon: CalendarCheck,   page: "FiscalCalendar",  path: "/FiscalCalendar", premium: true },
+  { name: "Relatórios",        icon: BarChart3,       page: "Reports",         premium: true },
+  { name: "Configurações",     icon: Settings,        page: "Settings",        premium: false },
 ];
 
 const getRoleLabel = (role) => ({ admin: "Administrador", contador: "Contador", empresa: "Empresa", suporte: "Suporte" }[role] || role);
