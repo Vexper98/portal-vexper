@@ -12,12 +12,14 @@ import {
   Download, FileText, Building2, Search, FileDown, RefreshCw,
   FileCheck, FileX, LayoutDashboard, TrendingUp, Calendar, Layers,
   Receipt, CreditCard, Banknote, AlertTriangle, Sparkles, Lock,
-  Clock, CheckCircle2, ArrowUpRight
+  Clock, CheckCircle2, ArrowUpRight, BarChart3, PieChart, Bell, 
+  CalendarCheck, Wallet, Shield, Zap
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { format, isAfter, isBefore, addDays } from "date-fns";
 import JSZip from "jszip";
 import UpgradeModal from "../contador/UpgradeModal";
+import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, PieChart as RechartsPie, Pie, Cell, Legend } from "recharts";
 
 const typeColors = {
   NFe: "bg-blue-500/15 text-blue-400 border-blue-400/30",
