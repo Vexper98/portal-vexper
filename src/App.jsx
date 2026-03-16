@@ -61,6 +61,9 @@ const AuthenticatedApp = () => {
       ))}
       <Route path="/FiscalSchedule" element={<LayoutWrapper currentPageName="FiscalSchedule"><FiscalSchedule /></LayoutWrapper>} />
       <Route path="/FiscalCalendar" element={<LayoutWrapper currentPageName="FiscalCalendar"><FiscalCalendar /></LayoutWrapper>} />
+      <Route path="/TaxGuides" element={<LayoutWrapper currentPageName="TaxGuides"><TaxGuides /></LayoutWrapper>} />
+      <Route path="/ContasAPagar" element={<LayoutWrapper currentPageName="ContasAPagar"><ContasAPagar /></LayoutWrapper>} />
+      <Route path="/ContasAReceber" element={<LayoutWrapper currentPageName="ContasAReceber"><ContasAReceber /></LayoutWrapper>} />
       <Route path="*" element={<PageNotFound />} />
     </Routes>
   );
