@@ -62,9 +62,14 @@ export default function Layout({ children, currentPageName }) {
       .then(n => setUnreadCount(n.length)).catch(() => {});
   }, [user, currentPageName]);
 
-  const knownRoles = ["admin", "contador", "suporte", "empresa"];
+  const [upgradeModal, setUpgradeModal] = useState(false);
+  const knownRoles = ["admin", "contador", "suporte", "empresa", "common_user"];
   const userRole = user ? (knownRoles.includes(user.role) ? user.role : "empresa") : null;
-  const filteredNav = userRole ? NAV_ITEMS.filter(item => item.roles.includes(userRole)) : [];
+  const isCommonUser = userRole === "common_user";
+  const userIsPro = user?.plan === "pro_contador" || user?.pro_enabled === true;
+  const filteredNav = userRole
+    ? (isCommonUser ? COMMON_USER_NAV : NAV_ITEMS.filter(item => item.roles.includes(userRole)))
+    : [];
 
   return (
     <div className="min-h-screen flex" style={{ background: "#060d1f" }}>
