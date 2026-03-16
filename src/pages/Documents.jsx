@@ -21,7 +21,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import {
   Search, FileText, Download, Eye, Trash2, MoreHorizontal,
-  PackageOpen, Copy, RefreshCw, CheckCircle2,
+  PackageOpen, Copy, RefreshCw, CheckCircle2, HardDrive, Building2,
 } from "lucide-react";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
