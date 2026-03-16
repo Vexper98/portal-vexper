@@ -117,7 +117,7 @@ export default function FiscalCalendar() {
     setSaving(false);
   };
 
-  const canCreate = user && ["admin", "contador"].includes(user.role);
+  const canCreate = user && ["admin", "contador", "empresa"].includes(user.role);
 
   return (
     <div className="space-y-6">
