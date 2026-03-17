@@ -3,7 +3,6 @@ import { Badge } from "@/components/ui/badge";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { FileText, ExternalLink, FileCheck } from "lucide-react";
-import { motion } from "framer-motion";
 
 const statusConfig = {
   recebido:   { label: "Recebido",   bg: "rgba(59,130,246,0.12)",   color: "#60a5fa", dot: "bg-blue-400"    },
