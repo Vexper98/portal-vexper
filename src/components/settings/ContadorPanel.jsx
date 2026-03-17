@@ -53,7 +53,12 @@ export default function ContadorPanel({ user }) {
   const load = async () => {
     setLoading(true);
     try {
-      const comps = await base44.entities.Company.filter({ contadorEmail: user.email });
+      // Admin vê todas as empresas; contadores veem apenas as vinculadas
+      const allComps = await base44.entities.Company.list("-created_date", 20000);
+      const isAdmin = user.role === "admin";
+      const comps = isAdmin
+        ? allComps
+        : allComps.filter(c => c.contadorEmail === user.email || c.contador_responsavel === user.email);
       setCompanies(comps);
       const compIds = new Set(comps.map(c => c.id));
       const docs = await base44.entities.Document.list("-created_date", 20000);
