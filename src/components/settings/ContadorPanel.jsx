@@ -657,14 +657,13 @@ export default function ContadorPanel({ user }) {
                   </TableCell>
                 </TableRow>
               ) : (
-                <AnimatePresence>
+                <>
                   {filtered.map((doc, i) => {
                     const comp = companies.find(c => c.id === doc.companyId);
                     const isSelected = selected.includes(doc.id);
                     const type = doc.documentType || "XML";
                     return (
-                      <motion.tr key={doc.id}
-                        initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: Math.min(i * 0.015, 0.3) }}
+                      <TableRow key={doc.id}
                         className="group cursor-default transition-all"
                         style={{ borderColor: "rgba(255,255,255,0.04)", background: isSelected ? "rgba(59,130,246,0.08)" : "transparent" }}>
                         <TableCell className="pl-6">
