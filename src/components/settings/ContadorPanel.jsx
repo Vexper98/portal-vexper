@@ -400,9 +400,13 @@ export default function ContadorPanel({ user }) {
               </div>
               <ResponsiveContainer width="100%" height={160}>
                 <RechartsPie>
-                  <Pie data={docsByType} cx="50%" cy="50%" outerRadius={60} dataKey="value" label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
-                    labelLine={false} fontSize={9}>
-                    {docsByType.map((entry, idx) => <Cell key={idx} fill={entry.color} />)}
+                  <Pie data={docsByType.length > 0 ? docsByType : [{ name: "Sem dados", value: 1, color: "#1e2d4a" }]}
+                    cx="50%" cy="50%" outerRadius={60} dataKey="value"
+                    label={docsByType.length > 0 ? ({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%` : false}
+                    labelLine={false}>
+                    {(docsByType.length > 0 ? docsByType : [{ color: "#1e2d4a" }]).map((entry, idx) => (
+                      <Cell key={idx} fill={entry.color} />
+                    ))}
                   </Pie>
                   <Tooltip contentStyle={{ background: "#0d1e35", border: "1px solid rgba(6,182,212,0.2)", borderRadius: 8, fontSize: 11, color: "#e2e8f0" }} />
                 </RechartsPie>
