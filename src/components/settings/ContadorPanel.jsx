@@ -617,6 +617,12 @@ export default function ContadorPanel({ user }) {
                   <SelectItem value="NFe">NF-e</SelectItem>
                   <SelectItem value="NFCe">NFC-e</SelectItem>
                   <SelectItem value="XML">XML</SelectItem>
+                  <SelectItem value="nfe_xml">NF-e (XML)</SelectItem>
+                  <SelectItem value="nfce_xml">NFC-e (XML)</SelectItem>
+                  <SelectItem value="cte_xml">CT-e (XML)</SelectItem>
+                  <SelectItem value="nfse_xml">NFS-e (XML)</SelectItem>
+                  <SelectItem value="pdf_nota">PDF Nota</SelectItem>
+                  <SelectItem value="outros">Outros</SelectItem>
                 </SelectContent>
               </Select>
             </div>
