@@ -353,6 +353,104 @@ export default function ContadorPanel({ user }) {
         ))}
       </div>
 
+      {/* Charts & Analytics - PRO */}
+      {userIsPro && docsByCompany.length > 0 && (
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.32 }}
+          className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {/* Bar chart: docs por empresa */}
+          <div className="relative rounded-2xl overflow-hidden p-5"
+            style={{ background: "linear-gradient(135deg, #0a1628, #0d1e35)", border: "1px solid rgba(6,182,212,0.12)" }}>
+            <img src="https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=600&q=40" alt=""
+              className="absolute inset-0 w-full h-full object-cover opacity-5" />
+            <div className="relative">
+              <div className="flex items-center gap-2 mb-4">
+                <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center">
+                  <BarChart3 className="w-4 h-4 text-white" />
+                </div>
+                <div>
+                  <h3 className="text-sm font-bold text-white">Docs por Empresa</h3>
+                  <p className="text-[10px] text-slate-500">Top clientes por volume</p>
+                </div>
+              </div>
+              <ResponsiveContainer width="100%" height={160}>
+                <BarChart data={docsByCompany} margin={{ top: 0, right: 0, left: -20, bottom: 0 }}>
+                  <XAxis dataKey="name" tick={{ fontSize: 9, fill: "#64748b" }} />
+                  <YAxis tick={{ fontSize: 9, fill: "#64748b" }} />
+                  <Tooltip contentStyle={{ background: "#0d1e35", border: "1px solid rgba(6,182,212,0.2)", borderRadius: 8, fontSize: 11, color: "#e2e8f0" }} />
+                  <Bar dataKey="docs" fill="#3b82f6" radius={[4, 4, 0, 0]} />
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
+          </div>
+
+          {/* Pie chart: tipos de documentos */}
+          <div className="relative rounded-2xl overflow-hidden p-5"
+            style={{ background: "linear-gradient(135deg, #0a1628, #0d1e35)", border: "1px solid rgba(6,182,212,0.12)" }}>
+            <img src="https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=600&q=40" alt=""
+              className="absolute inset-0 w-full h-full object-cover opacity-5" />
+            <div className="relative">
+              <div className="flex items-center gap-2 mb-4">
+                <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-violet-500 to-purple-600 flex items-center justify-center">
+                  <PieChart className="w-4 h-4 text-white" />
+                </div>
+                <div>
+                  <h3 className="text-sm font-bold text-white">Tipos de Documentos</h3>
+                  <p className="text-[10px] text-slate-500">Distribuição por tipo</p>
+                </div>
+              </div>
+              <ResponsiveContainer width="100%" height={160}>
+                <RechartsPie>
+                  <Pie data={docsByType} cx="50%" cy="50%" outerRadius={60} dataKey="value" label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
+                    labelLine={false} fontSize={9}>
+                    {docsByType.map((entry, idx) => <Cell key={idx} fill={entry.color} />)}
+                  </Pie>
+                  <Tooltip contentStyle={{ background: "#0d1e35", border: "1px solid rgba(6,182,212,0.2)", borderRadius: 8, fontSize: 11, color: "#e2e8f0" }} />
+                </RechartsPie>
+              </ResponsiveContainer>
+            </div>
+          </div>
+        </motion.div>
+      )}
+
+      {/* PRO summary cards */}
+      {userIsPro && (
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.35 }}
+          className="grid grid-cols-2 md:grid-cols-4 gap-3">
+          {[
+            {
+              label: "Total Documentos", value: documents.length, icon: FileText,
+              color: "from-blue-500 to-indigo-600", img: "https://images.unsplash.com/photo-1568234928966-359c35dd8327?w=300&q=50"
+            },
+            {
+              label: "Guias Pendentes", value: pendingGuides, icon: Receipt,
+              color: "from-amber-500 to-orange-500", img: "https://images.unsplash.com/photo-1554224155-6726b3ff858f?w=300&q=50"
+            },
+            {
+              label: "A Receber Atrasado", value: overdueAR, icon: AlertTriangle,
+              color: "from-rose-500 to-red-600", img: "https://images.unsplash.com/photo-1579621970563-ebec7560ff3e?w=300&q=50"
+            },
+            {
+              label: "Vence em 7 dias", value: upcomingAR.length, icon: Bell,
+              color: "from-violet-500 to-purple-600", img: "https://images.unsplash.com/photo-1506784365847-bbad939e9335?w=300&q=50"
+            },
+          ].map((item, i) => (
+            <motion.div key={item.label} whileHover={{ y: -3 }}
+              className="relative rounded-2xl overflow-hidden p-4"
+              style={{ background: "linear-gradient(135deg, #0a1628, #0d1e35)", border: "1px solid rgba(255,255,255,0.07)" }}>
+              <img src={item.img} alt="" className="absolute inset-0 w-full h-full object-cover opacity-10" />
+              <div className={`absolute top-0 left-0 right-0 h-0.5 bg-gradient-to-r ${item.color}`} />
+              <div className="relative">
+                <div className={`w-8 h-8 rounded-lg bg-gradient-to-br ${item.color} flex items-center justify-center shadow-md mb-2`}>
+                  <item.icon className="w-4 h-4 text-white" />
+                </div>
+                <p className="text-2xl font-black text-white">{item.value}</p>
+                <p className="text-[10px] text-slate-500 font-medium">{item.label}</p>
+              </div>
+            </motion.div>
+          ))}
+        </motion.div>
+      )}
+
       {/* Upsell card for free users */}
       {!userIsPro && (
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}
