@@ -391,7 +391,7 @@ export default function ContadorPanel({ user }) {
             <div className="relative">
               <div className="flex items-center gap-2 mb-4">
                 <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-violet-500 to-purple-600 flex items-center justify-center">
-                  <PieChart className="w-4 h-4 text-white" />
+                  <BarChart3 className="w-4 h-4 text-white" />
                 </div>
                 <div>
                   <h3 className="text-sm font-bold text-white">Tipos de Documentos</h3>
