@@ -65,11 +65,11 @@ export default function ContadorPanel({ user }) {
       const docs = isAdmin ? allDocs : allDocs.filter(d => compIds.has(d.companyId));
       setDocuments(docs);
 
-      if (userIsPro) {
+      if (userIsPro || user.role === "admin") {
         try {
           const [guides, ar] = await Promise.all([
-            base44.entities.TaxGuide.filter({ owner_user_id: user.email }),
-            base44.entities.AccountReceivable.filter({ owner_user_id: user.email }),
+            isAdmin ? base44.entities.TaxGuide.list("-created_date", 20000) : base44.entities.TaxGuide.filter({ owner_user_id: user.email }),
+            isAdmin ? base44.entities.AccountReceivable.list("-created_date", 20000) : base44.entities.AccountReceivable.filter({ owner_user_id: user.email }),
           ]);
           setTaxGuides(guides);
           setAccountsReceivable(ar);
