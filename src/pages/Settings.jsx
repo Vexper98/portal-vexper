@@ -48,7 +48,7 @@ function AdminPanel({ users, onInvite, onEditRole }) {
   const stats = [
     { label: "Total Usuários", value: users.length, icon: Users, color: "from-blue-500 to-indigo-600", shadow: "shadow-blue-500/20", light: "bg-blue-50", text: "text-blue-600" },
     { label: "Administradores", value: users.filter(u => u.role === "admin").length, icon: Shield, color: "from-red-500 to-rose-600", shadow: "shadow-red-500/20", light: "bg-red-50", text: "text-red-600" },
-    { label: "Contadores", value: users.filter(u => u.role === "contador").length, icon: Cpu, color: "from-violet-500 to-purple-600", shadow: "shadow-violet-500/20", light: "bg-violet-50", text: "text-violet-600" },
+    { label: "Contadores", value: users.filter(u => u.role === "contador" || u.role === "common_user").length, icon: Cpu, color: "from-violet-500 to-purple-600", shadow: "shadow-violet-500/20", light: "bg-violet-50", text: "text-violet-600" },
     { label: "Empresas", value: users.filter(u => u.role === "empresa").length, icon: Database, color: "from-emerald-500 to-teal-600", shadow: "shadow-emerald-500/20", light: "bg-emerald-50", text: "text-emerald-600" },
   ];
 
