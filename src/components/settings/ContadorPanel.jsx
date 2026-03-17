@@ -721,10 +721,10 @@ export default function ContadorPanel({ user }) {
                             </Button>
                           </motion.div>
                         </TableCell>
-                      </motion.tr>
+                      </TableRow>
                     );
                   })}
-                </AnimatePresence>
+                </>
               )}
             </TableBody>
           </Table>
