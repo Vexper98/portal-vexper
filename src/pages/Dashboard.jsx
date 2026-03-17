@@ -28,7 +28,8 @@ export default function Dashboard() {
       base44.entities.Company.list("-created_date", 20000),
       base44.entities.Document.list("-created_date", 20000),
     ]);
-    const restricted = u?.role === "contador";
+    const isAdmin = u?.role === "admin";
+    const restricted = !isAdmin && (u?.role === "contador" || u?.role === "common_user");
     const myCompanies = restricted
       ? comps.filter(c => c.contadorEmail === u.email || c.contador_responsavel === u.email)
       : comps;
