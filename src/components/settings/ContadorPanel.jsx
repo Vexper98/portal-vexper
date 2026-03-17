@@ -312,16 +312,27 @@ export default function ContadorPanel({ user }) {
       </div>
 
       {/* Module Cards Row */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
         {moduleCards.map((card, i) => (
           <motion.div key={card.label}
             initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 + i * 0.07 }}
-            whileHover={{ y: -3 }}
-            className="relative rounded-2xl border overflow-hidden cursor-pointer group transition-all"
+            whileHover={{ y: -4, scale: 1.01 }}
+            className="relative rounded-2xl overflow-hidden cursor-pointer group transition-all"
             style={{ background: "linear-gradient(135deg, #0a1628, #0d1e35)", border: "1px solid rgba(255,255,255,0.07)" }}
             onClick={card.onClick}>
+            {/* Background image */}
+            <img src={card.img} alt="" className="absolute inset-0 w-full h-full object-cover opacity-10 group-hover:opacity-15 transition-opacity" />
             <div className={`absolute top-0 left-0 right-0 h-1 bg-gradient-to-r ${card.color}`} />
-            <div className="p-4">
+            {/* Lock overlay for premium */}
+            {card.isPremium && (
+              <div className="absolute inset-0 bg-black/30 backdrop-blur-[1px] z-10 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                <div className="px-3 py-1.5 rounded-xl bg-amber-500/90 flex items-center gap-1.5">
+                  <Lock className="w-3.5 h-3.5 text-white" />
+                  <span className="text-[11px] font-bold text-white">Assinar PRO</span>
+                </div>
+              </div>
+            )}
+            <div className="relative p-4 z-[5]">
               <div className="flex items-start justify-between mb-3">
                 <div className={`w-10 h-10 rounded-xl bg-gradient-to-br ${card.color} flex items-center justify-center shadow-md`}>
                   <card.icon className="w-5 h-5 text-white" />
@@ -329,10 +340,10 @@ export default function ContadorPanel({ user }) {
                 {card.isPremium ? (
                   <Lock className="w-3.5 h-3.5 text-amber-400 mt-1" />
                 ) : (
-                  <ArrowUpRight className="w-3.5 h-3.5 text-slate-600 mt-1 group-hover:text-slate-400 transition-colors" />
+                  <ArrowUpRight className="w-3.5 h-3.5 text-slate-600 mt-1 group-hover:text-cyan-400 transition-colors" />
                 )}
               </div>
-              <p className="text-xl font-black text-white">{card.value}</p>
+              <p className={`text-xl font-black ${card.isPremium ? "text-slate-500" : "text-white"}`}>{card.value}</p>
               <p className="text-[11px] text-slate-500 mt-0.5 font-medium">{card.label}</p>
               {card.isPremium && (
                 <span className="text-[9px] font-bold text-amber-400 uppercase tracking-wider">⭐ Plano PRO</span>
