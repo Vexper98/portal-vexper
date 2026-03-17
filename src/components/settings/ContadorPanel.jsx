@@ -454,26 +454,51 @@ export default function ContadorPanel({ user }) {
       {/* Upsell card for free users */}
       {!userIsPro && (
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}
-          className="relative rounded-3xl overflow-hidden p-6 cursor-pointer group"
-          style={{ background: "linear-gradient(135deg, #0d1830, #0f2040)", border: "1px solid rgba(6,182,212,0.15)" }}
+          className="relative rounded-3xl overflow-hidden cursor-pointer group"
+          style={{ background: "linear-gradient(135deg, #0d1830, #0f2040)", border: "1px solid rgba(251,191,36,0.2)" }}
           onClick={() => setUpgradeModal(true)}>
-          <div className="absolute inset-0 opacity-20"
-            style={{ backgroundImage: "radial-gradient(circle at 20% 50%, rgba(6,182,212,0.5) 0%, transparent 40%), radial-gradient(circle at 80% 50%, rgba(99,102,241,0.4) 0%, transparent 40%)" }} />
-          <div className="relative flex flex-col md:flex-row md:items-center justify-between gap-4">
-            <div className="flex items-center gap-4">
-              <motion.div
-                animate={{ scale: [1, 1.1, 1] }} transition={{ duration: 2, repeat: Infinity }}
-                className="w-14 h-14 rounded-2xl bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center shadow-xl shadow-amber-500/30 flex-shrink-0">
-                <Sparkles className="w-7 h-7 text-white" />
-              </motion.div>
-              <div>
-                <h3 className="text-lg font-black text-white">Evolua para o ProContador</h3>
-                <p className="text-sm text-slate-400">Libere guias de impostos, contas a pagar e receber, relatórios, WhatsApp, Email e muito mais.</p>
+          <img src="https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=1200&q=50" alt=""
+            className="absolute inset-0 w-full h-full object-cover opacity-5 group-hover:opacity-10 transition-opacity" />
+          <div className="absolute inset-0 opacity-30"
+            style={{ backgroundImage: "radial-gradient(circle at 20% 50%, rgba(251,191,36,0.3) 0%, transparent 40%), radial-gradient(circle at 80% 50%, rgba(99,102,241,0.3) 0%, transparent 40%)" }} />
+          <div className="relative p-6">
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-5">
+              <div className="flex items-center gap-4">
+                <motion.div
+                  animate={{ scale: [1, 1.1, 1], rotate: [0, 5, -5, 0] }} transition={{ duration: 3, repeat: Infinity }}
+                  className="w-14 h-14 rounded-2xl bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center shadow-xl shadow-amber-500/30 flex-shrink-0">
+                  <Sparkles className="w-7 h-7 text-white" />
+                </motion.div>
+                <div>
+                  <h3 className="text-xl font-black text-white">Evolua para o ProContador ⭐</h3>
+                  <p className="text-sm text-amber-300/70">Tudo que um contador precisa para gerenciar seus clientes com eficiência</p>
+                </div>
               </div>
+              <Button className="rounded-2xl bg-gradient-to-r from-amber-400 to-orange-500 text-white border-0 hover:opacity-90 shadow-lg shadow-amber-500/30 px-6 flex-shrink-0 gap-2 whitespace-nowrap">
+                <Sparkles className="w-4 h-4" /> Quero assinar
+              </Button>
             </div>
-            <Button className="rounded-2xl bg-gradient-to-r from-amber-400 to-orange-500 text-white border-0 hover:opacity-90 shadow-lg shadow-amber-500/30 px-6 flex-shrink-0 gap-2">
-              <Sparkles className="w-4 h-4" /> Quero assinar
-            </Button>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
+              {[
+                { icon: Receipt, label: "Guias de Impostos", desc: "DAS, DARF, FGTS, INSS" },
+                { icon: CreditCard, label: "Contas a Pagar", desc: "Controle financeiro completo" },
+                { icon: Banknote, label: "Contas a Receber", desc: "Cobranças e mensalidades" },
+                { icon: BarChart3, label: "Gráficos & Relatórios", desc: "Análises em tempo real" },
+                { icon: Bell, label: "Alertas de Vencimento", desc: "Notificações automáticas" },
+                { icon: CalendarCheck, label: "Calendário Fiscal", desc: "Prazos e obrigações" },
+                { icon: Zap, label: "WhatsApp & Email", desc: "Envio automático ao cliente" },
+                { icon: Shield, label: "Segurança Avançada", desc: "Controle de acesso PRO" },
+              ].map((item) => (
+                <div key={item.label} className="flex items-center gap-2 px-3 py-2 rounded-xl"
+                  style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.06)" }}>
+                  <item.icon className="w-3.5 h-3.5 text-amber-400 flex-shrink-0" />
+                  <div>
+                    <p className="text-[10px] font-bold text-slate-200">{item.label}</p>
+                    <p className="text-[9px] text-slate-500">{item.desc}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
         </motion.div>
       )}
