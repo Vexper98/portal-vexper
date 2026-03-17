@@ -19,7 +19,7 @@ import { useNavigate } from "react-router-dom";
 import { format, isAfter, isBefore, addDays } from "date-fns";
 import JSZip from "jszip";
 import UpgradeModal from "../contador/UpgradeModal";
-import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, PieChart as RechartsPie, Pie, Cell, Legend } from "recharts";
+import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from "recharts";
 
 const typeColors = {
   NFe: "bg-blue-500/15 text-blue-400 border-blue-400/30",
