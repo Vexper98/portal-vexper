@@ -90,7 +90,7 @@ export default function RecentDocumentsTable({ documents }) {
                     </a>
                   )}
                 </td>
-              </motion.tr>
+              </tr>
             );
           })}
         </tbody>
