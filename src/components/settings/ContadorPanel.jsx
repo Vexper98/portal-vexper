@@ -32,7 +32,7 @@ const typeBg = {
   XML: "from-slate-400 to-slate-600",
 };
 
-const isPro = (user) => user?.plan === "pro_contador" || user?.pro_enabled === true;
+const isPro = (user) => user?.role === "admin" || user?.plan === "pro_contador" || user?.pro_enabled === true;
 
 export default function ContadorPanel({ user }) {
   const [companies, setCompanies] = useState([]);
