@@ -43,6 +43,7 @@ export default function ContadorPanel({ user }) {
   const [search, setSearch] = useState("");
   const [filterCompany, setFilterCompany] = useState("all");
   const [filterType, setFilterType] = useState("all");
+  const [filterSource, setFilterSource] = useState("all");
   const [selected, setSelected] = useState([]);
   const [downloading, setDownloading] = useState(false);
   const [upgradeModal, setUpgradeModal] = useState(false);
