@@ -399,7 +399,7 @@ export default function ContadorPanel({ user }) {
                 </div>
               </div>
               <ResponsiveContainer width="100%" height={160}>
-                <RechartsPie>
+                <PieChart>
                   <Pie data={docsByType.length > 0 ? docsByType : [{ name: "Sem dados", value: 1, color: "#1e2d4a" }]}
                     cx="50%" cy="50%" outerRadius={60} dataKey="value"
                     label={docsByType.length > 0 ? ({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%` : false}
@@ -409,7 +409,7 @@ export default function ContadorPanel({ user }) {
                     ))}
                   </Pie>
                   <Tooltip contentStyle={{ background: "#0d1e35", border: "1px solid rgba(6,182,212,0.2)", borderRadius: 8, fontSize: 11, color: "#e2e8f0" }} />
-                </RechartsPie>
+                </PieChart>
               </ResponsiveContainer>
             </div>
           </div>
