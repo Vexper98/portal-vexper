@@ -49,14 +49,9 @@ export default function RecentDocumentsTable({ documents }) {
             const st = statusConfig[doc.status] || statusConfig.recebido;
             const tipo = tipoConfig[doc.tipo_documento] || tipoConfig.outros;
             return (
-              <motion.tr key={doc.id}
-                initial={{ opacity: 0, x: -8 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: i * 0.04 }}
+              <tr key={doc.id}
                 style={{ borderBottom: "1px solid rgba(255,255,255,0.03)" }}
-                className="transition-colors group"
-                onMouseEnter={e => e.currentTarget.style.background = "rgba(255,255,255,0.02)"}
-                onMouseLeave={e => e.currentTarget.style.background = ""}
+                className="transition-colors group hover:bg-white/[0.02]"
               >
                 <td className="px-5 py-3">
                   <p className="text-sm font-semibold text-slate-200 truncate max-w-[140px]">{doc.company_name || "—"}</p>
