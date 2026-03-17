@@ -61,8 +61,9 @@ export default function ContadorPanel({ user }) {
         : allComps.filter(c => c.contadorEmail === user.email || c.contador_responsavel === user.email);
       setCompanies(comps);
       const compIds = new Set(comps.map(c => c.id));
-      const docs = await base44.entities.Document.list("-created_date", 20000);
-      setDocuments(docs.filter(d => compIds.has(d.companyId)));
+      const allDocs = await base44.entities.Document.list("-created_date", 20000);
+      const docs = isAdmin ? allDocs : allDocs.filter(d => compIds.has(d.companyId));
+      setDocuments(docs);
 
       if (userIsPro) {
         try {
