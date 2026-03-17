@@ -608,6 +608,18 @@ export default function ContadorPanel({ user }) {
                   {companies.map(c => <SelectItem key={c.id} value={c.id}>{c.razao_social}</SelectItem>)}
                 </SelectContent>
               </Select>
+              <Select value={filterSource} onValueChange={setFilterSource}>
+                <SelectTrigger className="h-9 text-sm w-full sm:w-36 rounded-xl"
+                  style={{ background: "rgba(255,255,255,0.05)", borderColor: "rgba(255,255,255,0.1)", color: "#e2e8f0" }}>
+                  <Building2 className="w-3.5 h-3.5 mr-1.5 text-slate-400" />
+                  <SelectValue placeholder="Fornecedor" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">Todos</SelectItem>
+                  <SelectItem value="agent">🤖 Agente (Fornecedor)</SelectItem>
+                  <SelectItem value="manual">Manual</SelectItem>
+                </SelectContent>
+              </Select>
               <Select value={filterType} onValueChange={setFilterType}>
                 <SelectTrigger className="h-9 text-sm w-full sm:w-32 rounded-xl"
                   style={{ background: "rgba(255,255,255,0.05)", borderColor: "rgba(255,255,255,0.1)", color: "#e2e8f0" }}>
