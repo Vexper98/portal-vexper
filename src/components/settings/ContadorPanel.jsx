@@ -85,7 +85,8 @@ export default function ContadorPanel({ user }) {
       d.accessKey?.includes(search);
     const matchComp = filterCompany === "all" || d.companyId === filterCompany;
     const matchType = filterType === "all" || d.documentType === filterType;
-    return matchSearch && matchComp && matchType;
+    const matchSource = filterSource === "all" || d.source === filterSource;
+    return matchSearch && matchComp && matchType && matchSource;
   });
 
   const toggleSelect = (id) => setSelected(prev => prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id]);
