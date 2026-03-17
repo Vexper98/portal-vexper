@@ -409,7 +409,7 @@ export default function ContadorPanel({ user }) {
                     ))}
                   </Pie>
                   <Tooltip contentStyle={{ background: "#0d1e35", border: "1px solid rgba(6,182,212,0.2)", borderRadius: 8, fontSize: 11, color: "#e2e8f0" }} />
-                </PieChart>
+                </RechartsPieChart>
               </ResponsiveContainer>
             </div>
           </div>
