@@ -399,7 +399,7 @@ export default function ContadorPanel({ user }) {
                 </div>
               </div>
               <ResponsiveContainer width="100%" height={160}>
-                <PieChart>
+                <RechartsPieChart>
                   <Pie data={docsByType.length > 0 ? docsByType : [{ name: "Sem dados", value: 1, color: "#1e2d4a" }]}
                     cx="50%" cy="50%" outerRadius={60} dataKey="value"
                     label={docsByType.length > 0 ? ({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%` : false}
