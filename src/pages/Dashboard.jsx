@@ -30,11 +30,13 @@ export default function Dashboard() {
     ]);
     const isAdmin = u?.role === "admin";
     const restricted = !isAdmin && (u?.role === "contador" || u?.role === "common_user");
+    const safeComps = (comps || []).filter(Boolean);
+    const safeDocs = (docs || []).filter(Boolean);
     const myCompanies = restricted
-      ? comps.filter(c => c.contadorEmail === u.email || c.contador_responsavel === u.email)
-      : comps;
+      ? safeComps.filter(c => c.contadorEmail === u.email || c.contador_responsavel === u.email)
+      : safeComps;
     const myIds = new Set(myCompanies.map(c => c.id));
-    const myDocs = restricted ? docs.filter(d => myIds.has(d.companyId)) : docs;
+    const myDocs = restricted ? safeDocs.filter(d => myIds.has(d.companyId)) : safeDocs;
     setCompanies(myCompanies);
     setDocuments(myDocs);
     setLoading(false);
