@@ -21,7 +21,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import {
   Search, FileText, Download, Eye, Trash2, MoreHorizontal,
-  PackageOpen, Copy, RefreshCw, CheckCircle2, HardDrive, Building2,
+  PackageOpen, Copy, RefreshCw, CheckCircle2, HardDrive, Building2, Wand2,
 } from "lucide-react";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
@@ -130,6 +130,7 @@ export default function Documents() {
   };
 
   const [downloading, setDownloading] = useState(false);
+  const [backfilling, setBackfilling] = useState(false);
   const [user, setUser] = useState(null);
   const [backupCompanyId, setBackupCompanyId] = useState(null);
   const [deleteCompanyTarget, setDeleteCompanyTarget] = useState(null);
@@ -195,6 +196,14 @@ export default function Documents() {
     loadData();
   };
 
+  const handleBackfill = async () => {
+    setBackfilling(true);
+    const res = await base44.functions.invoke("backfillEmissionDates", {});
+    alert(res.data?.message || "Concluído");
+    setBackfilling(false);
+    loadData();
+  };
+
   const copyKey = (key, id) => {
     navigator.clipboard.writeText(key);
     setCopiedKey(id);
@@ -219,8 +228,9 @@ export default function Documents() {
     const matchCompany = companyF === "all" || d.companyId === companyF;
     const matchSource  = sourceF === "all" || d.source === sourceF;
     const dt = d.uploadedAt || d.created_date || "";
-    const matchFrom = !dateFrom || dt >= dateFrom;
-    const matchTo   = !dateTo   || dt <= dateTo + "T23:59:59";
+    const dtEmissao = d.dataEmissao || "";
+    const matchFrom = !dateFrom || (dtEmissao ? dtEmissao >= dateFrom : dt >= dateFrom);
+    const matchTo   = !dateTo   || (dtEmissao ? dtEmissao <= dateTo   : dt <= dateTo + "T23:59:59");
     const matchCompetencia = !competenciaF || d.competencia === competenciaF;
     return matchSearch && matchStatus && matchType && matchCompany && matchSource && matchFrom && matchTo && matchCompetencia;
   });
@@ -259,6 +269,19 @@ export default function Documents() {
           <Button variant="outline" size="sm" onClick={loadData}>
             <RefreshCw className="w-4 h-4" />
           </Button>
+          {user?.role === "admin" && (
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handleBackfill}
+              disabled={backfilling}
+              title="Preencher datas de emissão em documentos antigos"
+              className="text-amber-400 border-amber-700 hover:bg-amber-900/20"
+            >
+              <Wand2 className="w-4 h-4 mr-1" />
+              {backfilling ? "Processando..." : "Preencher datas"}
+            </Button>
+          )}
           {selected.size > 0 && (
             <Button onClick={handleBulkDownload} disabled={downloading} className="bg-blue-600 hover:bg-blue-700">
               <PackageOpen className="w-4 h-4 mr-2" />
@@ -383,6 +406,7 @@ export default function Documents() {
             </div>
           </div>
           <div className="flex items-center gap-3 flex-wrap">
+            <span className="text-xs text-slate-500 font-medium">Emissão:</span>
             <div className="flex items-center gap-2">
               <span className="text-xs text-slate-500">De:</span>
               <Input type="date" className="w-36 h-8 text-xs" value={dateFrom} onChange={e => setDateFrom(e.target.value)} />
