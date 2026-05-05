@@ -58,6 +58,7 @@ export default function Documents() {
   const [sourceF, setSourceF]         = useState("all");
   const [dateFrom, setDateFrom]       = useState("");
   const [dateTo, setDateTo]           = useState("");
+  const [competenciaF, setCompetenciaF] = useState("");
 
   const [selected, setSelected]       = useState(new Set());
   const [viewerDoc, setViewerDoc]     = useState(null);
@@ -220,7 +221,8 @@ export default function Documents() {
     const dt = d.uploadedAt || d.created_date || "";
     const matchFrom = !dateFrom || dt >= dateFrom;
     const matchTo   = !dateTo   || dt <= dateTo + "T23:59:59";
-    return matchSearch && matchStatus && matchType && matchCompany && matchSource && matchFrom && matchTo;
+    const matchCompetencia = !competenciaF || d.competencia === competenciaF;
+    return matchSearch && matchStatus && matchType && matchCompany && matchSource && matchFrom && matchTo && matchCompetencia;
   });
 
   const allChecked = filtered.length > 0 && filtered.every(d => selected.has(d.id));
@@ -229,10 +231,13 @@ export default function Documents() {
     else setSelected(new Set(filtered.map(d => d.id)));
   };
 
-  const hasFilters = search || statusF !== "all" || typeF !== "all" || companyF !== "all" || sourceF !== "all" || dateFrom || dateTo;
+  // Competências disponíveis para filtro
+  const competencias = [...new Set(documents.map(d => d.competencia).filter(Boolean))].sort().reverse();
+
+  const hasFilters = search || statusF !== "all" || typeF !== "all" || companyF !== "all" || sourceF !== "all" || dateFrom || dateTo || competenciaF;
   const clearFilters = () => {
     setSearch(""); setStatusF("all"); setTypeF("all");
-    setCompanyF("all"); setSourceF("all"); setDateFrom(""); setDateTo("");
+    setCompanyF("all"); setSourceF("all"); setDateFrom(""); setDateTo(""); setCompetenciaF("");
   };
 
   if (loading) return (
@@ -364,6 +369,17 @@ export default function Documents() {
                   <SelectItem value="manual">Manual</SelectItem>
                 </SelectContent>
               </Select>
+              <Select value={competenciaF} onValueChange={setCompetenciaF}>
+                <SelectTrigger className="w-36"><SelectValue placeholder="Competência" /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value={null}>Todas Competências</SelectItem>
+                  {competencias.map(c => (
+                    <SelectItem key={c} value={c}>
+                      {c.slice(5, 7)}/{c.slice(0, 4)}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
           </div>
           <div className="flex items-center gap-3 flex-wrap">
@@ -398,9 +414,11 @@ export default function Documents() {
                 <TableHead className="text-[11px] font-semibold text-slate-500 uppercase tracking-wide">Tipo</TableHead>
                 <TableHead className="text-[11px] font-semibold text-slate-500 uppercase tracking-wide">Chave de Acesso</TableHead>
                 <TableHead className="text-[11px] font-semibold text-slate-500 uppercase tracking-wide">CNPJ Emitente</TableHead>
+                <TableHead className="text-[11px] font-semibold text-slate-500 uppercase tracking-wide">Emissão</TableHead>
+                <TableHead className="text-[11px] font-semibold text-slate-500 uppercase tracking-wide">Competência</TableHead>
                 <TableHead className="text-[11px] font-semibold text-slate-500 uppercase tracking-wide">Origem</TableHead>
                 <TableHead className="text-[11px] font-semibold text-slate-500 uppercase tracking-wide">Status</TableHead>
-                <TableHead className="text-[11px] font-semibold text-slate-500 uppercase tracking-wide">Data/Hora</TableHead>
+                <TableHead className="text-[11px] font-semibold text-slate-500 uppercase tracking-wide">Recebido em</TableHead>
                 <TableHead className="w-12"></TableHead>
               </TableRow>
             </TableHeader>
@@ -443,6 +461,12 @@ export default function Documents() {
                     <TableCell className="font-mono text-xs text-slate-500">
                       {doc.emitterCnpj || <span className="text-slate-300">—</span>}
                     </TableCell>
+                    <TableCell className="text-xs text-slate-400 whitespace-nowrap">
+                      {doc.dataEmissao ? format(new Date(doc.dataEmissao + "T12:00:00"), "dd/MM/yyyy", { locale: ptBR }) : "—"}
+                    </TableCell>
+                    <TableCell className="text-xs font-semibold text-cyan-400 whitespace-nowrap">
+                      {doc.competencia ? `${doc.competencia.slice(5, 7)}/${doc.competencia.slice(0, 4)}` : "—"}
+                    </TableCell>
                     <TableCell>
                       <Badge variant="outline" className={`text-[10px] ${src.cls}`}>{src.label}</Badge>
                     </TableCell>
@@ -483,7 +507,7 @@ export default function Documents() {
               })}
               {filtered.length === 0 && (
                 <TableRow>
-                  <TableCell colSpan={10} className="text-center py-16 text-slate-400">
+                  <TableCell colSpan={12} className="text-center py-16 text-slate-400">
                     <FileText className="w-10 h-10 mx-auto mb-3 opacity-30" />
                     <p className="font-medium">Nenhum documento encontrado</p>
                     <p className="text-xs mt-1">Ajuste os filtros ou aguarde o agente enviar documentos</p>
