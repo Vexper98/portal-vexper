@@ -1,0 +1,83 @@
+{
+  "name": "Document",
+  "type": "object",
+  "properties": {
+    "companyId": {
+      "type": "string",
+      "description": "ID da empresa"
+    },
+    "filename": {
+      "type": "string",
+      "description": "Nome salvo do arquivo"
+    },
+    "originalFilename": {
+      "type": "string",
+      "description": "Nome original do arquivo"
+    },
+    "documentType": {
+      "type": "string",
+      "enum": [
+        "NFe",
+        "NFCe",
+        "XML"
+      ],
+      "default": "XML",
+      "description": "Tipo do documento fiscal detectado automaticamente"
+    },
+    "xmlContent": {
+      "type": "string",
+      "description": "Conte\u00fado completo do XML"
+    },
+    "fileUrl": {
+      "type": "string",
+      "description": "URL do arquivo no storage"
+    },
+    "accessKey": {
+      "type": "string",
+      "description": "Chave de acesso de 44 d\u00edgitos"
+    },
+    "emitterCnpj": {
+      "type": "string",
+      "description": "CNPJ do emitente extra\u00eddo do XML"
+    },
+    "dataEmissao": {
+      "type": "string",
+      "format": "date",
+      "description": "Data de emiss\u00e3o do documento extra\u00edda do XML"
+    },
+    "competencia": {
+      "type": "string",
+      "description": "M\u00eas/ano de compet\u00eancia extra\u00eddo do XML (ex: 2026-03)"
+    },
+    "contentHash": {
+      "type": "string",
+      "description": "Hash SHA-256 do conte\u00fado para deduplica\u00e7\u00e3o"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "recebido",
+        "processado",
+        "erro"
+      ],
+      "default": "recebido"
+    },
+    "source": {
+      "type": "string",
+      "enum": [
+        "agent",
+        "manual"
+      ],
+      "default": "agent",
+      "description": "Origem: agente desktop ou upload manual"
+    },
+    "uploadedAt": {
+      "type": "string",
+      "format": "date-time"
+    }
+  },
+  "required": [
+    "companyId",
+    "filename"
+  ]
+}

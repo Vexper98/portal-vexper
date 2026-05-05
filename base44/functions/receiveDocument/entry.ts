@@ -38,6 +38,32 @@ function extractCnpj(xmlContent) {
   return m ? m[1] : null;
 }
 
+// Extrai data de emissão do XML e retorna { dataEmissao: "YYYY-MM-DD", competencia: "YYYY-MM" }
+function extractEmissionDate(xmlContent) {
+  // Tenta <dhEmi> (NFe/NFCe): formato 2024-03-15T10:30:00-03:00
+  const mDh = xmlContent.match(/<dhEmi>(\d{4}-\d{2}-\d{2})T/);
+  if (mDh) {
+    const date = mDh[1]; // YYYY-MM-DD
+    const competencia = date.slice(0, 7); // YYYY-MM
+    return { dataEmissao: date, competencia };
+  }
+  // Tenta <dEmi> (formato antigo): YYYY-MM-DD
+  const mDe = xmlContent.match(/<dEmi>(\d{4}-\d{2}-\d{2})<\/dEmi>/);
+  if (mDe) {
+    const date = mDe[1];
+    const competencia = date.slice(0, 7);
+    return { dataEmissao: date, competencia };
+  }
+  // Tenta <dtEmissao> (CTe/NFSe)
+  const mDt = xmlContent.match(/<dtEmissao>(\d{4}-\d{2}-\d{2})/);
+  if (mDt) {
+    const date = mDt[1];
+    const competencia = date.slice(0, 7);
+    return { dataEmissao: date, competencia };
+  }
+  return { dataEmissao: null, competencia: null };
+}
+
 async function saveLog(base44, companyId, filename, message, level) {
   try {
     await base44.asServiceRole.entities.AgentLog.create({ companyId, filename, message, level });
@@ -74,6 +100,7 @@ async function processSingleDocument(base44, companyId, filename, xmlContent, do
   const documentType = detectType(xmlContent, documentTypeHint);
   const accessKey = extractAccessKey(xmlContent);
   const emitterCnpj = extractCnpj(xmlContent);
+  const { dataEmissao, competencia } = extractEmissionDate(xmlContent);
 
   // Deduplicação
   if (accessKey) {
@@ -102,17 +129,19 @@ async function processSingleDocument(base44, companyId, filename, xmlContent, do
     accessKey: accessKey || null,
     emitterCnpj: emitterCnpj || null,
     contentHash: contentHash || null,
+    dataEmissao: dataEmissao || null,
+    competencia: competencia || null,
     status: "recebido",
     source: "agent",
     uploadedAt: now,
   });
 
   await saveLog(base44, companyId, filename,
-    `Documento recebido | Tipo: ${documentType} | Chave: ${accessKey || "N/A"} | CNPJ: ${emitterCnpj || "N/A"}`,
+    `Documento recebido | Tipo: ${documentType} | Chave: ${accessKey || "N/A"} | CNPJ: ${emitterCnpj || "N/A"} | Emissão: ${dataEmissao || "N/A"} | Competência: ${competencia || "N/A"}`,
     "info"
   );
 
-  return { success: true, filename, documentId: document.id, documentType, accessKey };
+  return { success: true, filename, documentId: document.id, documentType, accessKey, dataEmissao, competencia };
 }
 
 // Processa batch em paralelo com concorrência limitada
