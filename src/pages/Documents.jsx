@@ -196,10 +196,27 @@ export default function Documents() {
     loadData();
   };
 
+  const [backfillProgress, setBackfillProgress] = useState("");
+
   const handleBackfill = async () => {
     setBackfilling(true);
-    const res = await base44.functions.invoke("backfillEmissionDates", {});
-    alert(res.data?.message || "Concluído");
+    setBackfillProgress("Iniciando...");
+    let totalUpdated = 0;
+    let round = 0;
+    while (true) {
+      round++;
+      setBackfillProgress(`Processando lote ${round}... (${totalUpdated} atualizados até agora)`);
+      const res = await base44.functions.invoke("backfillEmissionDates", {});
+      const data = res.data;
+      totalUpdated += data?.updated || 0;
+      if (!data?.hasMore || data?.updated === 0) {
+        setBackfillProgress("");
+        alert(`Concluído! ${totalUpdated} documentos atualizados.\n${data?.message || ""}`);
+        break;
+      }
+      // Pequena pausa entre lotes
+      await new Promise(r => setTimeout(r, 1000));
+    }
     setBackfilling(false);
     loadData();
   };
@@ -278,7 +295,7 @@ export default function Documents() {
               className="text-amber-400 border-amber-700 hover:bg-amber-900/20"
             >
               <Wand2 className="w-4 h-4 mr-1" />
-              {backfilling ? "Processando..." : "Preencher datas"}
+              {backfilling ? (backfillProgress || "Processando...") : "Preencher datas"}
             </Button>
           )}
           {selected.size > 0 && (

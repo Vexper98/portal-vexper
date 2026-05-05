@@ -38,28 +38,50 @@ function extractCnpj(xmlContent) {
   return m ? m[1] : null;
 }
 
-// Extrai data de emissão do XML e retorna { dataEmissao: "YYYY-MM-DD", competencia: "YYYY-MM" }
+// Extrai data de emissão do XML - cobre todos os padrões fiscais brasileiros
 function extractEmissionDate(xmlContent) {
-  // Tenta <dhEmi> (NFe/NFCe): formato 2024-03-15T10:30:00-03:00
-  const mDh = xmlContent.match(/<dhEmi>(\d{4}-\d{2}-\d{2})T/);
+  if (!xmlContent) return { dataEmissao: null, competencia: null };
+
+  // 1. <dhEmi>2024-03-15T10:30:00-03:00</dhEmi>  (NFe/NFCe padrão atual)
+  const mDh = xmlContent.match(/<dhEmi>\s*(\d{4}-\d{2}-\d{2})T/);
   if (mDh) {
-    const date = mDh[1]; // YYYY-MM-DD
-    const competencia = date.slice(0, 7); // YYYY-MM
-    return { dataEmissao: date, competencia };
+    const date = mDh[1];
+    return { dataEmissao: date, competencia: date.slice(0, 7) };
   }
-  // Tenta <dEmi> (formato antigo): YYYY-MM-DD
-  const mDe = xmlContent.match(/<dEmi>(\d{4}-\d{2}-\d{2})<\/dEmi>/);
+  // 2. <dEmi>2024-03-15</dEmi>  (NFe layout antigo)
+  const mDe = xmlContent.match(/<dEmi>\s*(\d{4}-\d{2}-\d{2})\s*<\/dEmi>/);
   if (mDe) {
     const date = mDe[1];
-    const competencia = date.slice(0, 7);
-    return { dataEmissao: date, competencia };
+    return { dataEmissao: date, competencia: date.slice(0, 7) };
   }
-  // Tenta <dtEmissao> (CTe/NFSe)
-  const mDt = xmlContent.match(/<dtEmissao>(\d{4}-\d{2}-\d{2})/);
+  // 3. <dtEmissao>2024-03-15</dtEmissao>  (CTe / NFSe)
+  const mDt = xmlContent.match(/<dtEmissao>\s*(\d{4}-\d{2}-\d{2})/);
   if (mDt) {
     const date = mDt[1];
-    const competencia = date.slice(0, 7);
-    return { dataEmissao: date, competencia };
+    return { dataEmissao: date, competencia: date.slice(0, 7) };
+  }
+  // 4. <DataEmissao>2024-03-15</DataEmissao>  (NFSe variação)
+  const mDe2 = xmlContent.match(/<DataEmissao>\s*(\d{4}-\d{2}-\d{2})/i);
+  if (mDe2) {
+    const date = mDe2[1];
+    return { dataEmissao: date, competencia: date.slice(0, 7) };
+  }
+  // 5. <DataEmissaoRPS>2024-03-15</DataEmissaoRPS>  (NFSe RPS)
+  const mRps = xmlContent.match(/<DataEmissaoRPS>\s*(\d{4}-\d{2}-\d{2})/i);
+  if (mRps) {
+    const date = mRps[1];
+    return { dataEmissao: date, competencia: date.slice(0, 7) };
+  }
+  // 6. Fallback: chave de acesso 44 dígitos (posições 2-5 = AAMM)
+  const chave = xmlContent.match(/\b(\d{44})\b/);
+  if (chave) {
+    const k = chave[1];
+    const ano = "20" + k.slice(2, 4);
+    const mes = k.slice(4, 6);
+    const mesNum = parseInt(mes, 10);
+    if (mesNum >= 1 && mesNum <= 12) {
+      return { dataEmissao: `${ano}-${mes}-01`, competencia: `${ano}-${mes}` };
+    }
   }
   return { dataEmissao: null, competencia: null };
 }
