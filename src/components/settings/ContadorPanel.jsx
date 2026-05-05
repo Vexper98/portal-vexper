@@ -44,6 +44,9 @@ export default function ContadorPanel({ user }) {
   const [filterCompany, setFilterCompany] = useState("all");
   const [filterType, setFilterType] = useState("all");
   const [filterSource, setFilterSource] = useState("all");
+  const [filterCompetencia, setFilterCompetencia] = useState("");
+  const [filterDateFrom, setFilterDateFrom] = useState("");
+  const [filterDateTo, setFilterDateTo] = useState("");
   const [selected, setSelected] = useState([]);
   const [downloading, setDownloading] = useState(false);
   const [upgradeModal, setUpgradeModal] = useState(false);
@@ -92,8 +95,15 @@ export default function ContadorPanel({ user }) {
     const matchComp = filterCompany === "all" || d.companyId === filterCompany;
     const matchType = filterType === "all" || d.documentType === filterType;
     const matchSource = filterSource === "all" || d.source === filterSource;
-    return matchSearch && matchComp && matchType && matchSource;
+    const matchCompetencia = !filterCompetencia || d.competencia === filterCompetencia;
+    const emissao = d.dataEmissao || "";
+    const matchFrom = !filterDateFrom || emissao >= filterDateFrom;
+    const matchTo   = !filterDateTo   || emissao <= filterDateTo;
+    return matchSearch && matchComp && matchType && matchSource && matchCompetencia && matchFrom && matchTo;
   });
+
+  // Competências disponíveis
+  const competencias = [...new Set(documents.map(d => d.competencia).filter(Boolean))].sort().reverse();
 
   const toggleSelect = (id) => setSelected(prev => prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id]);
   const toggleAll = () => setSelected(selected.length === filtered.length ? [] : filtered.map(d => d.id));
@@ -646,6 +656,40 @@ export default function ContadorPanel({ user }) {
                 </SelectContent>
               </Select>
             </div>
+            {/* Filtros de data / competência */}
+            <div className="flex flex-wrap gap-2 items-center mt-1">
+              <Select value={filterCompetencia} onValueChange={setFilterCompetencia}>
+                <SelectTrigger className="h-9 text-sm w-full sm:w-44 rounded-xl"
+                  style={{ background: "rgba(255,255,255,0.05)", borderColor: "rgba(255,255,255,0.1)", color: "#e2e8f0" }}>
+                  <Calendar className="w-3.5 h-3.5 mr-1.5 text-slate-400" />
+                  <SelectValue placeholder="Competência" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value={null}>Todas competências</SelectItem>
+                  {competencias.map(c => (
+                    <SelectItem key={c} value={c}>{c.slice(5, 7)}/{c.slice(0, 4)}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <div className="flex items-center gap-1.5">
+                <span className="text-xs text-slate-500">Emissão de:</span>
+                <input type="date" value={filterDateFrom} onChange={e => setFilterDateFrom(e.target.value)}
+                  className="h-9 px-2 rounded-xl text-xs"
+                  style={{ background: "rgba(255,255,255,0.05)", borderColor: "rgba(255,255,255,0.1)", color: "#e2e8f0", border: "1px solid rgba(255,255,255,0.1)" }} />
+              </div>
+              <div className="flex items-center gap-1.5">
+                <span className="text-xs text-slate-500">até:</span>
+                <input type="date" value={filterDateTo} onChange={e => setFilterDateTo(e.target.value)}
+                  className="h-9 px-2 rounded-xl text-xs"
+                  style={{ background: "rgba(255,255,255,0.05)", borderColor: "rgba(255,255,255,0.1)", color: "#e2e8f0", border: "1px solid rgba(255,255,255,0.1)" }} />
+              </div>
+              {(filterCompetencia || filterDateFrom || filterDateTo) && (
+                <button onClick={() => { setFilterCompetencia(""); setFilterDateFrom(""); setFilterDateTo(""); }}
+                  className="text-xs text-slate-500 hover:text-red-400 underline-offset-2 hover:underline transition-colors">
+                  Limpar datas
+                </button>
+              )}
+            </div>
           </div>
         </div>
 
@@ -660,6 +704,8 @@ export default function ContadorPanel({ user }) {
                 <TableHead className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Arquivo</TableHead>
                 <TableHead className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Empresa</TableHead>
                 <TableHead className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Tipo</TableHead>
+                <TableHead className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Emissão</TableHead>
+                <TableHead className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Competência</TableHead>
                 <TableHead className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Recebido em</TableHead>
                 <TableHead className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Origem</TableHead>
                 <TableHead className="w-14" />
@@ -668,7 +714,7 @@ export default function ContadorPanel({ user }) {
             <TableBody>
               {filtered.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={7} className="py-20 text-center">
+                  <TableCell colSpan={9} className="py-20 text-center">
                     <motion.div initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }}
                       className="flex flex-col items-center gap-4">
                       <div className="w-20 h-20 rounded-3xl flex items-center justify-center shadow-inner"
@@ -716,15 +762,21 @@ export default function ContadorPanel({ user }) {
                           </div>
                         </TableCell>
                         <TableCell>
-                          <Badge variant="outline" className={`text-[10px] font-bold px-2 ${typeColors[type]}`}>{type}</Badge>
+                         <Badge variant="outline" className={`text-[10px] font-bold px-2 ${typeColors[type]}`}>{type}</Badge>
+                        </TableCell>
+                        <TableCell className="text-xs text-slate-400 whitespace-nowrap">
+                         {doc.dataEmissao ? (() => { try { return format(new Date(doc.dataEmissao + "T12:00:00"), "dd/MM/yyyy"); } catch { return "—"; } })() : "—"}
+                        </TableCell>
+                        <TableCell className="text-xs font-semibold text-cyan-400 whitespace-nowrap">
+                         {doc.competencia ? `${doc.competencia.slice(5, 7)}/${doc.competencia.slice(0, 4)}` : "—"}
                         </TableCell>
                         <TableCell>
-                          <div className="flex items-center gap-1.5">
-                            <Calendar className="w-3 h-3 text-slate-600 flex-shrink-0" />
-                            <span className="text-xs text-slate-500">
-                              {doc.created_date ? (() => { try { return format(new Date(doc.created_date), "dd/MM/yyyy HH:mm"); } catch { return "—"; } })() : "—"}
-                            </span>
-                          </div>
+                         <div className="flex items-center gap-1.5">
+                           <Calendar className="w-3 h-3 text-slate-600 flex-shrink-0" />
+                           <span className="text-xs text-slate-500">
+                             {doc.created_date ? (() => { try { return format(new Date(doc.created_date), "dd/MM/yyyy HH:mm"); } catch { return "—"; } })() : "—"}
+                           </span>
+                         </div>
                         </TableCell>
                         <TableCell>
                           {doc.source === "agent" ? (
