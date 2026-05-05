@@ -227,10 +227,9 @@ export default function Documents() {
     const matchType    = typeF   === "all" || d.documentType === typeF;
     const matchCompany = companyF === "all" || d.companyId === companyF;
     const matchSource  = sourceF === "all" || d.source === sourceF;
-    const dt = d.uploadedAt || d.created_date || "";
     const dtEmissao = d.dataEmissao || "";
-    const matchFrom = !dateFrom || (dtEmissao ? dtEmissao >= dateFrom : dt >= dateFrom);
-    const matchTo   = !dateTo   || (dtEmissao ? dtEmissao <= dateTo   : dt <= dateTo + "T23:59:59");
+    const matchFrom = !dateFrom || (dtEmissao >= dateFrom);
+    const matchTo   = !dateTo   || (dtEmissao && dtEmissao <= dateTo);
     const matchCompetencia = !competenciaF || d.competencia === competenciaF;
     return matchSearch && matchStatus && matchType && matchCompany && matchSource && matchFrom && matchTo && matchCompetencia;
   });
