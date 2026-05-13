@@ -117,6 +117,19 @@ async function resolveCompany(base44, token) {
   return { companyId: null, company: null };
 }
 
+// Faz upload do XML como arquivo e retorna a URL
+async function uploadXmlFile(base44, filename, xmlContent) {
+  try {
+    const blob = new Blob([xmlContent], { type: "application/xml" });
+    const formData = new FormData();
+    formData.append("file", blob, filename);
+    const result = await base44.asServiceRole.integrations.Core.UploadFile({ file: blob });
+    return result?.file_url || null;
+  } catch {
+    return null;
+  }
+}
+
 // Processa um único documento
 async function processSingleDocument(base44, companyId, filename, xmlContent, documentTypeHint) {
   const documentType = detectType(xmlContent, documentTypeHint);
@@ -142,12 +155,26 @@ async function processSingleDocument(base44, companyId, filename, xmlContent, do
   const contentHash = accessKey ? null : await sha256(xmlContent);
   const now = new Date().toISOString();
 
+  // Decide se salva xmlContent inline ou faz upload como arquivo
+  const XML_INLINE_LIMIT = 200 * 1024; // 200KB inline, acima disso faz upload
+  let xmlContentToSave = null;
+  let fileUrl = null;
+
+  if (xmlContent.length <= XML_INLINE_LIMIT) {
+    xmlContentToSave = xmlContent;
+  } else {
+    fileUrl = await uploadXmlFile(base44, filename, xmlContent);
+    // Se upload falhar, tenta salvar inline mesmo assim
+    if (!fileUrl) xmlContentToSave = xmlContent;
+  }
+
   const document = await base44.asServiceRole.entities.Document.create({
     companyId,
     filename,
     originalFilename: filename,
     documentType,
-    xmlContent,
+    xmlContent: xmlContentToSave,
+    fileUrl: fileUrl || null,
     accessKey: accessKey || null,
     emitterCnpj: emitterCnpj || null,
     contentHash: contentHash || null,
