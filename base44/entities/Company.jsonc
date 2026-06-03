@@ -1,0 +1,127 @@
+{
+  "name": "Company",
+  "type": "object",
+  "properties": {
+    "razao_social": {
+      "type": "string",
+      "description": "Raz\u00e3o social da empresa"
+    },
+    "nome_fantasia": {
+      "type": "string",
+      "description": "Nome fantasia da empresa"
+    },
+    "cnpj": {
+      "type": "string",
+      "description": "CNPJ da empresa"
+    },
+    "inscricao_estadual": {
+      "type": "string"
+    },
+    "endereco": {
+      "type": "string"
+    },
+    "cidade": {
+      "type": "string"
+    },
+    "estado": {
+      "type": "string"
+    },
+    "cep": {
+      "type": "string"
+    },
+    "telefone": {
+      "type": "string"
+    },
+    "email": {
+      "type": "string"
+    },
+    "companyCode": {
+      "type": "string",
+      "description": "C\u00f3digo \u00fanico da empresa para identifica\u00e7\u00e3o"
+    },
+    "agentToken": {
+      "type": "string",
+      "description": "Token de autentica\u00e7\u00e3o exclusivo do agente desktop"
+    },
+    "active": {
+      "type": "boolean",
+      "default": true,
+      "description": "Empresa habilitada para receber via API"
+    },
+    "contador_responsavel": {
+      "type": "string",
+      "description": "Nome do contador respons\u00e1vel"
+    },
+    "contadorEmail": {
+      "type": "string",
+      "description": "Email do usu\u00e1rio contador vinculado (controla acesso no portal)"
+    },
+    "pasta_sincronizacao": {
+      "type": "string"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "ativa",
+        "inativa",
+        "suspensa"
+      ],
+      "default": "ativa"
+    },
+    "lastSyncAt": {
+      "type": "string",
+      "format": "date-time",
+      "description": "\u00daltima sincroniza\u00e7\u00e3o via agente"
+    },
+    "ultimo_envio": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "observacoes": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "razao_social",
+    "cnpj"
+  ],
+  "rls": {
+    "create": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "read": {
+      "$or": [
+        {
+          "data.contadorEmail": "{{user.email}}"
+        },
+        {
+          "created_by": "{{user.email}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "update": {
+      "$or": [
+        {
+          "data.contadorEmail": "{{user.email}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}

@@ -200,10 +200,10 @@ export default function Dashboard() {
       </div>
 
       {/* ALERT */}
-      <AnimatePresence>
+      <AnimatePresence mode="wait">
         {companiesNoSend.length > 0 && (
           <motion.div
-            initial={{ opacity: 0, y: -8, height: 0 }} animate={{ opacity: 1, y: 0, height: "auto" }} exit={{ opacity: 0, height: 0 }}
+            initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }}
             className="flex items-center gap-4 p-4 rounded-2xl"
             style={{ background: "linear-gradient(135deg, rgba(245,158,11,0.1), rgba(234,88,12,0.08))", border: "1px solid rgba(245,158,11,0.2)" }}
           >

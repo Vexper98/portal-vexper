@@ -1,0 +1,74 @@
+{
+  "name": "TaxGuide",
+  "type": "object",
+  "properties": {
+    "owner_user_id": {
+      "type": "string",
+      "description": "Email do contador dono"
+    },
+    "company_id": {
+      "type": "string"
+    },
+    "company_name": {
+      "type": "string"
+    },
+    "tipo_guia": {
+      "type": "string",
+      "enum": [
+        "DAS",
+        "DARF",
+        "FGTS",
+        "INSS",
+        "ICMS",
+        "ISS",
+        "Simples Nacional",
+        "outro"
+      ],
+      "default": "DAS"
+    },
+    "referencia": {
+      "type": "string",
+      "description": "Refer\u00eancia/descri\u00e7\u00e3o"
+    },
+    "competencia": {
+      "type": "string",
+      "description": "Ex: 2026-03"
+    },
+    "valor": {
+      "type": "number"
+    },
+    "vencimento": {
+      "type": "string",
+      "format": "date"
+    },
+    "arquivo_url": {
+      "type": "string"
+    },
+    "observacoes": {
+      "type": "string"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "pendente",
+        "enviada",
+        "paga",
+        "vencida"
+      ],
+      "default": "pendente"
+    },
+    "sent_whatsapp_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "sent_email_at": {
+      "type": "string",
+      "format": "date-time"
+    }
+  },
+  "required": [
+    "company_id",
+    "tipo_guia",
+    "competencia"
+  ]
+}

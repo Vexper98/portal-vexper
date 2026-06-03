@@ -1,0 +1,45 @@
+{
+  "name": "CompanyContact",
+  "type": "object",
+  "properties": {
+    "company_id": {
+      "type": "string",
+      "description": "ID da empresa vinculada"
+    },
+    "nome": {
+      "type": "string",
+      "description": "Nome do contato"
+    },
+    "cargo": {
+      "type": "string",
+      "description": "Cargo ou fun\u00e7\u00e3o"
+    },
+    "telefone": {
+      "type": "string"
+    },
+    "whatsapp": {
+      "type": "string"
+    },
+    "email": {
+      "type": "string"
+    },
+    "tipo": {
+      "type": "string",
+      "enum": [
+        "responsavel",
+        "financeiro",
+        "fiscal",
+        "ti",
+        "outro"
+      ],
+      "default": "responsavel"
+    },
+    "observacoes": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "company_id",
+    "nome"
+  ]
+}

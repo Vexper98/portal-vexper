@@ -1,0 +1,51 @@
+{
+  "name": "AccountPayable",
+  "type": "object",
+  "properties": {
+    "owner_user_id": {
+      "type": "string"
+    },
+    "company_id": {
+      "type": "string"
+    },
+    "company_name": {
+      "type": "string"
+    },
+    "descricao": {
+      "type": "string"
+    },
+    "categoria": {
+      "type": "string"
+    },
+    "valor": {
+      "type": "number"
+    },
+    "vencimento": {
+      "type": "string",
+      "format": "date"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "pendente",
+        "pago",
+        "vencido"
+      ],
+      "default": "pendente"
+    },
+    "forma_pagamento": {
+      "type": "string"
+    },
+    "comprovante_url": {
+      "type": "string"
+    },
+    "observacoes": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "company_id",
+    "descricao",
+    "valor"
+  ]
+}

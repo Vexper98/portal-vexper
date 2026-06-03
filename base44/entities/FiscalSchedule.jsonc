@@ -1,0 +1,59 @@
+{
+  "name": "FiscalSchedule",
+  "type": "object",
+  "properties": {
+    "company_id": {
+      "type": "string"
+    },
+    "company_name": {
+      "type": "string"
+    },
+    "competencia": {
+      "type": "string",
+      "description": "M\u00eas/ano ex: 2026-03"
+    },
+    "data_limite": {
+      "type": "string",
+      "format": "date"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "pendente",
+        "em_andamento",
+        "concluido",
+        "atrasado"
+      ],
+      "default": "pendente"
+    },
+    "tipo_fechamento": {
+      "type": "string",
+      "enum": [
+        "mensal",
+        "trimestral",
+        "anual"
+      ],
+      "default": "mensal"
+    },
+    "contador_email": {
+      "type": "string"
+    },
+    "observacoes": {
+      "type": "string"
+    },
+    "prioridade": {
+      "type": "string",
+      "enum": [
+        "baixa",
+        "normal",
+        "alta",
+        "urgente"
+      ],
+      "default": "normal"
+    }
+  },
+  "required": [
+    "company_id",
+    "competencia"
+  ]
+}

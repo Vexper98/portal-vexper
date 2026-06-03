@@ -1,0 +1,60 @@
+{
+  "name": "SyncToken",
+  "type": "object",
+  "properties": {
+    "company_id": {
+      "type": "string",
+      "description": "ID da empresa vinculada"
+    },
+    "company_name": {
+      "type": "string",
+      "description": "Nome da empresa"
+    },
+    "company_cnpj": {
+      "type": "string"
+    },
+    "token": {
+      "type": "string",
+      "description": "Token de autentica\u00e7\u00e3o \u00fanico"
+    },
+    "descricao": {
+      "type": "string",
+      "description": "Descri\u00e7\u00e3o / identificador do token"
+    },
+    "pasta_monitorada": {
+      "type": "string",
+      "description": "Caminho da pasta monitorada configurada"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "ativo",
+        "revogado",
+        "expirado"
+      ],
+      "default": "ativo"
+    },
+    "ultimo_uso": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Data/hora do \u00faltimo uso do token"
+    },
+    "versao_agente": {
+      "type": "string",
+      "description": "Vers\u00e3o do agente instalado"
+    },
+    "so_agente": {
+      "type": "string",
+      "description": "Sistema operacional onde o agente est\u00e1 instalado",
+      "enum": [
+        "windows",
+        "linux",
+        "macos"
+      ]
+    }
+  },
+  "required": [
+    "company_id",
+    "token"
+  ]
+}

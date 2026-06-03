@@ -1,0 +1,50 @@
+{
+  "name": "ActivityLog",
+  "type": "object",
+  "properties": {
+    "company_id": {
+      "type": "string"
+    },
+    "company_name": {
+      "type": "string"
+    },
+    "tipo": {
+      "type": "string",
+      "enum": [
+        "upload",
+        "erro",
+        "reenvio",
+        "login",
+        "configuracao",
+        "exclusao",
+        "processamento"
+      ],
+      "description": "Tipo da atividade"
+    },
+    "descricao": {
+      "type": "string",
+      "description": "Descri\u00e7\u00e3o da atividade"
+    },
+    "documento_id": {
+      "type": "string",
+      "description": "ID do documento relacionado, se houver"
+    },
+    "usuario": {
+      "type": "string",
+      "description": "Email do usu\u00e1rio que realizou a a\u00e7\u00e3o"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "sucesso",
+        "falha",
+        "aviso"
+      ],
+      "default": "sucesso"
+    }
+  },
+  "required": [
+    "tipo",
+    "descricao"
+  ]
+}
