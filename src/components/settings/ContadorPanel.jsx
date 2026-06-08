@@ -624,6 +624,18 @@ export default function ContadorPanel({ user }) {
                 </div>
               </div>
               <div className="flex gap-2 flex-wrap">
+                <Button size="sm" variant="outline" onClick={selectAllFiltered} disabled={filtered.length === 0 || selected.length === filtered.length}
+                  className="rounded-xl gap-1.5 border-cyan-500/30 text-cyan-400 hover:text-white"
+                  style={{ background: "rgba(6,182,212,0.08)" }}>
+                  Selecionar todos {filtered.length > 0 ? `(${filtered.length})` : ""}
+                </Button>
+                {selected.length > 0 && (
+                  <Button size="sm" variant="outline" onClick={() => setSelected([])}
+                    className="rounded-xl gap-1.5 border-white/10 text-slate-400 hover:text-white"
+                    style={{ background: "rgba(255,255,255,0.05)" }}>
+                    Limpar seleção
+                  </Button>
+                )}
                 <AnimatePresence>
                   {selected.length > 0 && (
                     <motion.div initial={{ opacity: 0, scale: 0.85 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.85 }}>
