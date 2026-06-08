@@ -8,6 +8,7 @@ import { BarChart3, PieChart as PieIcon, FileText, Building2 } from "lucide-reac
 import StatCard from "../components/dashboard/StatCard";
 import { format, subMonths, startOfMonth, endOfMonth } from "date-fns";
 import { ptBR } from "date-fns/locale";
+import { listAll } from "@/lib/base44-pagination";
 
 const COLORS = ["#2563eb", "#0ea5e9", "#10b981", "#f59e0b", "#ef4444", "#8b5cf6"];
 
@@ -26,7 +27,9 @@ export default function Reports() {
     const load = async () => {
       const [u, docs, comps] = await Promise.all([
         base44.auth.me(),
-        base44.entities.Document.list("-created_date", 5000),
+        listAll(base44.entities.Document, "-created_date", {
+          fields: ["id", "companyId", "documentType", "status", "source", "uploadedAt", "created_date", "valor_nota"],
+        }),
         base44.entities.Company.list("-created_date", 200),
       ]);
       const isContador = u?.role === "contador";

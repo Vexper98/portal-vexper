@@ -9,6 +9,7 @@ import ActivityChart from "../components/dashboard/ActivityChart";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
 import { startOfDay, startOfWeek, startOfMonth } from "date-fns";
+import { listAll } from "@/lib/base44-pagination";
 
 const LOGO_URL = "https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/69b20f55fd3ef9a7984c9160/a79383218_logo.png";
 
@@ -24,8 +25,12 @@ export default function Dashboard() {
     if (manual) setRefreshing(true);
     const [u, comps, docs] = await Promise.all([
       base44.auth.me(),
-      base44.entities.Company.list("-created_date", 20000),
-      base44.entities.Document.list("-created_date", 20000),
+      listAll(base44.entities.Company, "-created_date", {
+        fields: ["id", "razao_social", "nome_fantasia", "cnpj", "contadorEmail", "contador_responsavel", "active", "status", "lastSyncAt", "ultimo_envio"],
+      }),
+      listAll(base44.entities.Document, "-created_date", {
+        fields: ["id", "companyId", "filename", "documentType", "status", "source", "uploadedAt", "created_date"],
+      }),
     ]);
     const isAdmin = u?.role === "admin";
     const restricted = !isAdmin && (u?.role === "contador" || u?.role === "common_user");
