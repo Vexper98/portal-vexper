@@ -101,7 +101,7 @@ async function resolveCompany(base44, token, requestedCompanyId = null) {
   if (matchedSync) {
     const companyId = matchedSync.company_id;
     if (requestedCompanyId && requestedCompanyId !== companyId) {
-      return { companyId: null, company: null, mismatch: true };
+      console.log(`[WARN] Company ID informado (${requestedCompanyId}) difere do token (${companyId}). Usando empresa do token.`);
     }
     // Atualizar último uso sem bloquear
     base44.asServiceRole.entities.SyncToken.update(matchedSync.id, { ultimo_uso: new Date().toISOString() }).catch(() => {});
@@ -115,12 +115,12 @@ async function resolveCompany(base44, token, requestedCompanyId = null) {
   const matchedByToken = allCompanies.find(c => c.agentToken === token);
   if (matchedByToken) {
     if (requestedCompanyId && requestedCompanyId !== matchedByToken.id) {
-      return { companyId: null, company: null, mismatch: true };
+      console.log(`[WARN] Company ID informado (${requestedCompanyId}) difere do token (${matchedByToken.id}). Usando empresa do token.`);
     }
     return { companyId: matchedByToken.id, company: matchedByToken };
   }
 
-  return { companyId: null, company: null, mismatch: false };
+  return { companyId: null, company: null };
 }
 
 // Faz upload do XML como arquivo e retorna a URL
@@ -329,15 +329,8 @@ Deno.serve(async (req) => {
     }
 
     // ── 2. Resolve company ──────────────────────────────────
-    const { companyId: cId, company, mismatch } = await resolveCompany(base44, token, requestedCompanyId);
+    const { companyId: cId, company } = await resolveCompany(base44, token, requestedCompanyId);
     companyId = cId;
-
-    if (mismatch) {
-      return Response.json(
-        { success: false, message: "Token não pertence à empresa informada. Verifique token e Company ID no agente." },
-        { status: 403, headers: CORS }
-      );
-    }
 
     if (!company) {
       return Response.json(
