@@ -1,5 +1,4 @@
 import React from "react";
-import { motion } from "framer-motion";
 
 const colorMap = {
   blue:   { grad: "from-blue-500 to-cyan-500",    glow: "shadow-blue-500/25",    border: "rgba(59,130,246,0.2)",  accent: "#3b82f6" },
@@ -14,9 +13,7 @@ export default function StatCard({ title, value, icon: Icon, color, subtitle }) 
   const c = colorMap[color] || colorMap.blue;
 
   return (
-    <motion.div
-      whileHover={{ y: -3, scale: 1.01 }}
-      transition={{ type: "spring", stiffness: 300 }}
+    <div
       className="relative rounded-2xl overflow-hidden group cursor-default"
       style={{
         background: "linear-gradient(135deg, #0a1628 0%, #0d1e35 100%)",
@@ -34,15 +31,11 @@ export default function StatCard({ title, value, icon: Icon, color, subtitle }) 
         <div className="flex items-start justify-between">
           <div className="flex-1">
             <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-500">{title}</p>
-            <motion.p
-              key={value}
-              initial={{ scale: 0.8, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              transition={{ type: "spring", stiffness: 200 }}
+            <p
               className="text-3xl font-bold text-white mt-1.5 leading-none"
             >
               {value}
-            </motion.p>
+            </p>
             {subtitle && <p className="text-[11px] text-slate-500 mt-2">{subtitle}</p>}
           </div>
           <div className={`w-11 h-11 rounded-xl bg-gradient-to-br ${c.grad} flex items-center justify-center shadow-lg ${c.glow} group-hover:scale-110 transition-transform duration-300`}>
@@ -50,6 +43,6 @@ export default function StatCard({ title, value, icon: Icon, color, subtitle }) 
           </div>
         </div>
       </div>
-    </motion.div>
+    </div>
   );
 }

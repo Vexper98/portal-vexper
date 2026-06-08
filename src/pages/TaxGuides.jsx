@@ -9,10 +9,9 @@ import { Label } from "@/components/ui/label";
 import { Skeleton } from "@/components/ui/skeleton";
 import { toast } from "sonner";
 import { motion, AnimatePresence } from "framer-motion";
-import { format } from "date-fns";
 import {
-  Receipt, Plus, Search, Building2, RefreshCw, MessageCircle,
-  Mail, CheckCircle2, Download, Trash2, Filter, AlertTriangle
+  Receipt, Plus, Search, RefreshCw, MessageCircle,
+  Mail, CheckCircle2
 } from "lucide-react";
 import UpgradeModal from "../components/contador/UpgradeModal";
 

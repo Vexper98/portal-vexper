@@ -3,16 +3,14 @@ import { Link, useNavigate, useLocation } from "react-router-dom";
 import { base44 } from "@/api/base44Client";
 import {
   LayoutDashboard, Building2, FileText, Upload, Bell, BarChart3,
-  Settings, LogOut, Menu, X, ChevronDown, Shield, Zap, Users, Download,
+  Settings, LogOut, Menu, X, ChevronDown, Zap, Users,
   CalendarCheck, Receipt, CreditCard, Banknote, Lock, Sparkles
 } from "lucide-react";
 import UpgradeModal from "./components/contador/UpgradeModal";
-import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import {
   DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSeparator
 } from "@/components/ui/dropdown-menu";
-import { motion, AnimatePresence } from "framer-motion";
 
 const LOGO_URL = "https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/69b20f55fd3ef9a7984c9160/a79383218_logo.png";
 
@@ -192,16 +190,13 @@ export default function Layout({ children, currentPageName }) {
       </aside>
 
       {/* Overlay mobile */}
-      <AnimatePresence>
-        {sidebarOpen && (
-          <motion.div
-            initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+      {sidebarOpen && (
+          <div
             className="fixed inset-0 z-40 lg:hidden"
             style={{ background: "rgba(0,0,0,0.7)" }}
             onClick={() => setSidebarOpen(false)}
           />
         )}
-      </AnimatePresence>
 
       {/* Main */}
       <div className="flex-1 lg:ml-64 flex flex-col min-h-screen">

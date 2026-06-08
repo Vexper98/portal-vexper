@@ -2,7 +2,6 @@ import React from "react";
 import { Link } from "react-router-dom";
 import { createPageUrl } from "@/utils";
 import { Building2, AlertTriangle, CheckCircle2, Clock } from "lucide-react";
-import { motion } from "framer-motion";
 
 const avatarColors = [
   "from-blue-500 to-cyan-500",
@@ -37,7 +36,7 @@ export default function CompanyStatusList({ companies }) {
       {companies.map((company, i) => {
         const status = getStatusInfo(company);
         return (
-          <motion.div key={company.id} initial={{ opacity: 0, x: 10 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: i * 0.05 }}>
+          <div key={company.id}>
             <Link
               to={createPageUrl(`CompanyDetail?id=${company.id}`)}
               className="flex items-center gap-3 px-4 py-3 transition-colors group rounded-lg"
@@ -55,15 +54,13 @@ export default function CompanyStatusList({ companies }) {
                 <p className="text-[10px] text-slate-600 truncate font-mono">{company.cnpj}</p>
               </div>
               <div className="flex items-center gap-1.5 flex-shrink-0">
-                <motion.div
+                <div
                   className={`w-1.5 h-1.5 rounded-full ${status.dot}`}
-                  animate={status.dot === "bg-emerald-400" ? { opacity: [1, 0.3, 1] } : {}}
-                  transition={{ duration: 2, repeat: Infinity }}
                 />
                 <span className={`text-[10px] font-semibold ${status.color}`}>{status.label}</span>
               </div>
             </Link>
-          </motion.div>
+          </div>
         );
       })}
     </div>

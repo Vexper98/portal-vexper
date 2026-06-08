@@ -8,7 +8,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import {
   Plus, Search, Download, Key, Activity, Wifi, WifiOff,
-  ShieldCheck, RefreshCw, Info, Terminal, Zap, Settings2, ScrollText
+  ShieldCheck, Info, Terminal, Zap, Settings2, ScrollText
 } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import TokenCard from "../components/sync/TokenCard";
@@ -444,9 +444,9 @@ export default function SyncAgent() {
                 </h4>
                 <div className="bg-slate-900 rounded-xl p-4 font-mono text-xs space-y-1.5">
                   <p className="text-slate-400"># POST multipart/form-data</p>
-                  <p><span className="text-cyan-400">URL</span><span className="text-slate-300">: {window.location.origin}/api/receiveDocument</span></p>
+                  <p><span className="text-cyan-400">URL</span><span className="text-slate-300">: {window.location.origin}/api/functions/receiveDocument</span></p>
                   <p><span className="text-cyan-400">Header</span><span className="text-slate-300">: Authorization: Bearer SEU_TOKEN</span></p>
-                  <p><span className="text-cyan-400">Campo</span><span className="text-slate-300">: companyId = SEU_COMPANY_ID</span></p>
+                  <p><span className="text-cyan-400">Campo opcional</span><span className="text-slate-300">: companyId = SEU_COMPANY_ID</span></p>
                   <p><span className="text-cyan-400">Campo</span><span className="text-slate-300">: file = arquivo.xml</span></p>
                 </div>
               </div>

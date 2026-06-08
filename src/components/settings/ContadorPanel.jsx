@@ -10,10 +10,9 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Download, FileText, Building2, Search, FileDown, RefreshCw,
-  FileCheck, FileX, LayoutDashboard, TrendingUp, Calendar, Layers,
-  Receipt, CreditCard, Banknote, AlertTriangle, Sparkles, Lock,
-  Clock, CheckCircle2, ArrowUpRight, BarChart3, Bell, 
-  CalendarCheck, Wallet, Shield, Zap
+  FileCheck, FileX, LayoutDashboard, Calendar, Layers,
+  Receipt, CreditCard, Banknote, AlertTriangle, Sparkles, Lock, ArrowUpRight, BarChart3, Bell, 
+  CalendarCheck, Shield, Zap
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { format, isAfter, isBefore, addDays } from "date-fns";

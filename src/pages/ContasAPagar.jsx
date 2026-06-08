@@ -8,7 +8,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "
 import { Label } from "@/components/ui/label";
 import { Skeleton } from "@/components/ui/skeleton";
 import { toast } from "sonner";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 import { CreditCard, Plus, Search, CheckCircle2, RefreshCw, Trash2 } from "lucide-react";
 import UpgradeModal from "../components/contador/UpgradeModal";
 

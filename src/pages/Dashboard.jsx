@@ -1,14 +1,13 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { base44 } from "@/api/base44Client";
 import { Badge } from "@/components/ui/badge";
-import { Building2, FileText, AlertTriangle, Clock, Zap, RefreshCw, Activity, Shield } from "lucide-react";
+import { Building2, FileText, AlertTriangle, Clock, Zap, RefreshCw, Activity } from "lucide-react";
 import StatCard from "../components/dashboard/StatCard";
 import RecentDocumentsTable from "../components/dashboard/RecentDocumentsTable";
 import CompanyStatusList from "../components/dashboard/CompanyStatusList";
 import ActivityChart from "../components/dashboard/ActivityChart";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
-import { motion, AnimatePresence } from "framer-motion";
 import { startOfDay, startOfWeek, startOfMonth } from "date-fns";
 
 const LOGO_URL = "https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/69b20f55fd3ef9a7984c9160/a79383218_logo.png";
@@ -94,10 +93,7 @@ export default function Dashboard() {
     <div className="space-y-5 min-h-screen -m-4 lg:-m-8 p-4 lg:p-8" style={{ background: "linear-gradient(160deg, #060d1f 0%, #070f20 60%, #040c1a 100%)" }}>
 
       {/* HERO BANNER */}
-      <motion.div
-        initial={{ opacity: 0, y: -16 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
+      <div
         className="relative rounded-2xl overflow-hidden"
         style={{ background: "linear-gradient(135deg, #060d1f 0%, #0d1b38 50%, #071528 100%)" }}
       >
@@ -110,37 +106,31 @@ export default function Dashboard() {
         <div className="absolute bottom-0 left-1/3 w-64 h-40 rounded-full blur-[60px]" style={{ background: "radial-gradient(circle, rgba(59,130,246,0.15) 0%, transparent 70%)" }} />
 
         {/* Scan line */}
-        <motion.div
+        <div
           className="absolute left-0 right-0 h-px pointer-events-none"
-          style={{ background: "linear-gradient(90deg, transparent, rgba(6,182,212,0.4), transparent)" }}
-          animate={{ top: ["0%", "100%"] }}
-          transition={{ duration: 5, repeat: Infinity, ease: "linear" }}
+          style={{ top: "40%", background: "linear-gradient(90deg, transparent, rgba(6,182,212,0.4), transparent)" }}
         />
 
         {/* Pulse dots */}
         {[...Array(4)].map((_, i) => (
-          <motion.div key={i}
+          <div key={i}
             className="absolute rounded-full bg-cyan-400"
             style={{ width: 3, height: 3, top: `${20 + i * 20}%`, left: `${8 + i * 22}%`, opacity: 0.4 }}
-            animate={{ opacity: [0.2, 0.8, 0.2], scale: [1, 2, 1] }}
-            transition={{ duration: 2.5 + i * 0.4, repeat: Infinity, delay: i * 0.5 }}
           />
         ))}
 
         <div className="relative px-8 py-7 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6">
           {/* Left: logo + title */}
           <div className="flex items-center gap-5">
-            <motion.img
+            <img
               src={LOGO_URL}
               alt="Exper Sistemas"
               className="h-20 w-auto"
               style={{ filter: "brightness(1.3) drop-shadow(0 0 12px rgba(6,182,212,0.4))" }}
-              animate={{ filter: ["brightness(1.1) drop-shadow(0 0 8px rgba(6,182,212,0.3))", "brightness(1.4) drop-shadow(0 0 16px rgba(6,182,212,0.6))", "brightness(1.1) drop-shadow(0 0 8px rgba(6,182,212,0.3))"] }}
-              transition={{ duration: 4, repeat: Infinity }}
             />
             <div>
               <div className="flex items-center gap-2 mb-1">
-                <motion.div className="w-1.5 h-1.5 rounded-full bg-green-400" animate={{ opacity: [1, 0.3, 1] }} transition={{ duration: 2, repeat: Infinity }} />
+                <div className="w-1.5 h-1.5 rounded-full bg-green-400" />
                 <span className="text-[10px] text-green-400 font-semibold uppercase tracking-[0.2em]">Sistema Online</span>
                 <span className="text-[10px] text-slate-600 font-mono">·</span>
                 {syncing ? (
@@ -183,7 +173,7 @@ export default function Dashboard() {
             </Button>
           </div>
         </div>
-      </motion.div>
+      </div>
 
       {/* STAT CARDS */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
@@ -192,18 +182,16 @@ export default function Dashboard() {
           { title: "Docs Hoje",       value: docsToday,       icon: FileText,   color: "cyan",   subtitle: `${docsWeek} semana · ${docsMonth} mês` },
           { title: "Via Agente",      value: agentDocs,       icon: Zap,        color: "purple", subtitle: `${documents.length - agentDocs} manual(is)` },
           { title: "Erros / Atrasos", value: docsErro,        icon: AlertTriangle, color: "red", subtitle: `${companiesNoSend.length} sem sincronização` },
-        ].map((card, i) => (
-          <motion.div key={card.title} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.08 }}>
+        ].map((card) => (
+          <div key={card.title}>
             <StatCard {...card} />
-          </motion.div>
+          </div>
         ))}
       </div>
 
       {/* ALERT */}
-      <AnimatePresence mode="wait">
-        {companiesNoSend.length > 0 && (
-          <motion.div
-            initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }}
+      {companiesNoSend.length > 0 && (
+          <div
             className="flex items-center gap-4 p-4 rounded-2xl"
             style={{ background: "linear-gradient(135deg, rgba(245,158,11,0.1), rgba(234,88,12,0.08))", border: "1px solid rgba(245,158,11,0.2)" }}
           >
@@ -217,12 +205,11 @@ export default function Dashboard() {
                 {companiesNoSend.length > 3 && ` e mais ${companiesNoSend.length - 3}...`}
               </p>
             </div>
-          </motion.div>
+          </div>
         )}
-      </AnimatePresence>
 
       {/* CHART + STATUS */}
-      <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.35 }}
+      <div
         className="grid grid-cols-1 lg:grid-cols-3 gap-5">
 
         {/* Chart */}
@@ -263,10 +250,10 @@ export default function Dashboard() {
             <CompanyStatusList companies={companies.slice(0, 8)} />
           </div>
         </div>
-      </motion.div>
+      </div>
 
       {/* RECENT DOCS */}
-      <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.45 }}
+      <div
         className="rounded-2xl overflow-hidden" style={{ background: "linear-gradient(135deg, #0a1628, #0d1e35)", border: "1px solid rgba(16,185,129,0.15)" }}>
         <div className="flex items-center justify-between px-6 py-4" style={{ borderBottom: "1px solid rgba(255,255,255,0.06)" }}>
           <div className="flex items-center gap-3">
@@ -290,7 +277,7 @@ export default function Dashboard() {
           </div>
         </div>
         <RecentDocumentsTable documents={enrichedDocs.slice(0, 10)} />
-      </motion.div>
+      </div>
     </div>
   );
 }

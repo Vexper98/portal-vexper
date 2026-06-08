@@ -2,10 +2,9 @@ import React from "react";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
-import {
-  Lock, Sparkles, MessageCircle, X, Receipt, CreditCard, Banknote,
-  BarChart3, Bell, CalendarCheck, Zap, Shield, FileText, Building2,
-  TrendingUp, Wallet, CheckCircle2
+import { Sparkles, MessageCircle, X, Receipt, CreditCard, Banknote,
+  BarChart3, Bell, CalendarCheck, Zap, Shield, Building2,
+  TrendingUp
 } from "lucide-react";
 
 const ADMIN_WHATSAPP = "5511999999999";

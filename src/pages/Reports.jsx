@@ -2,7 +2,7 @@ import React, { useState, useEffect, useMemo } from "react";
 import { base44 } from "@/api/base44Client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, Legend } from "recharts";
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from "recharts";
 import { Skeleton } from "@/components/ui/skeleton";
 import { BarChart3, PieChart as PieIcon, FileText, Building2 } from "lucide-react";
 import StatCard from "../components/dashboard/StatCard";
@@ -26,7 +26,7 @@ export default function Reports() {
     const load = async () => {
       const [u, docs, comps] = await Promise.all([
         base44.auth.me(),
-        base44.entities.FiscalDocument.list("-created_date", 1000),
+        base44.entities.Document.list("-created_date", 5000),
         base44.entities.Company.list("-created_date", 200),
       ]);
       const isContador = u?.role === "contador";
@@ -34,7 +34,17 @@ export default function Reports() {
         ? comps.filter(c => c.contadorEmail === u.email || c.contador_responsavel === u.email)
         : comps;
       const myIds = new Set(myCompanies.map(c => c.id));
-      const myDocs = isContador ? docs.filter(d => myIds.has(d.company_id)) : docs;
+      const normalizedDocs = docs.map(d => ({
+        ...d,
+        company_id: d.companyId || d.company_id,
+        tipo_documento: d.tipo_documento || (
+          d.documentType === "NFe" ? "nfe_xml" :
+          d.documentType === "NFCe" ? "nfce_xml" :
+          "outros"
+        ),
+        created_date: d.uploadedAt || d.created_date,
+      }));
+      const myDocs = isContador ? normalizedDocs.filter(d => myIds.has(d.company_id)) : normalizedDocs;
       setDocuments(myDocs);
       setCompanies(myCompanies);
       setLoading(false);

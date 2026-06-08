@@ -93,13 +93,16 @@ async function saveLog(base44, companyId, filename, message, level) {
 }
 
 // Resolve empresa a partir do token
-async function resolveCompany(base44, token) {
+async function resolveCompany(base44, token, requestedCompanyId = null) {
   // Strategy A: SyncToken
   const allTokens = await base44.asServiceRole.entities.SyncToken.list("-created_date", 500);
   const matchedSync = allTokens.find(t => t.token === token && t.status === "ativo");
 
   if (matchedSync) {
     const companyId = matchedSync.company_id;
+    if (requestedCompanyId && requestedCompanyId !== companyId) {
+      return { companyId: null, company: null, mismatch: true };
+    }
     // Atualizar último uso sem bloquear
     base44.asServiceRole.entities.SyncToken.update(matchedSync.id, { ultimo_uso: new Date().toISOString() }).catch(() => {});
     const companies = await base44.asServiceRole.entities.Company.list("-created_date", 500);
@@ -111,10 +114,13 @@ async function resolveCompany(base44, token) {
   const allCompanies = await base44.asServiceRole.entities.Company.list("-created_date", 500);
   const matchedByToken = allCompanies.find(c => c.agentToken === token);
   if (matchedByToken) {
+    if (requestedCompanyId && requestedCompanyId !== matchedByToken.id) {
+      return { companyId: null, company: null, mismatch: true };
+    }
     return { companyId: matchedByToken.id, company: matchedByToken };
   }
 
-  return { companyId: null, company: null };
+  return { companyId: null, company: null, mismatch: false };
 }
 
 // Faz upload do XML como arquivo e retorna a URL
@@ -234,31 +240,15 @@ Deno.serve(async (req) => {
       );
     }
 
-    // ── 2. Resolve company ──────────────────────────────────
-    const { companyId: cId, company } = await resolveCompany(base44, token);
-    companyId = cId;
-
-    if (!company) {
-      return Response.json(
-        { success: false, message: "Token inválido. Verifique o token em Agente Sync > Configuração do Agente." },
-        { status: 401, headers: CORS }
-      );
-    }
-
-    if (company.active === false || company.status === "inativa" || company.status === "suspensa") {
-      return Response.json(
-        { success: false, message: "Empresa inativa. Entre em contato com o contador." },
-        { status: 403, headers: CORS }
-      );
-    }
-
     // ── 3. Parse body ───────────────────────────────────────
     const contentType = req.headers.get("Content-Type") || "";
     let filesToProcess = []; // Array de { filename, xmlContent, documentTypeHint }
+    let requestedCompanyId = null;
 
     if (contentType.includes("multipart/form-data")) {
       const formData = await req.formData();
       const documentTypeHint = formData.get("documentType") || null;
+      requestedCompanyId = formData.get("companyId") || formData.get("company_id") || null;
 
       // Suporta campo "file" único OU múltiplos campos "files" / "file_0", "file_1", etc.
       const singleFile = formData.get("file");
@@ -303,6 +293,7 @@ Deno.serve(async (req) => {
 
     } else if (contentType.includes("application/json")) {
       const body = await req.json();
+      requestedCompanyId = body.companyId || body.company_id || null;
 
       // Modo batch: { documents: [{ filename, xmlContent, documentType? }, ...] }
       if (body.documents && Array.isArray(body.documents)) {
@@ -334,6 +325,31 @@ Deno.serve(async (req) => {
       return Response.json(
         { success: false, message: `Content-Type inválido: "${contentType}". Use multipart/form-data ou application/json` },
         { status: 415, headers: CORS }
+      );
+    }
+
+    // ── 2. Resolve company ──────────────────────────────────
+    const { companyId: cId, company, mismatch } = await resolveCompany(base44, token, requestedCompanyId);
+    companyId = cId;
+
+    if (mismatch) {
+      return Response.json(
+        { success: false, message: "Token não pertence à empresa informada. Verifique token e Company ID no agente." },
+        { status: 403, headers: CORS }
+      );
+    }
+
+    if (!company) {
+      return Response.json(
+        { success: false, message: "Token inválido. Verifique o token em Agente Sync > Configuração do Agente." },
+        { status: 401, headers: CORS }
+      );
+    }
+
+    if (company.active === false || company.status === "inativa" || company.status === "suspensa") {
+      return Response.json(
+        { success: false, message: "Empresa inativa. Entre em contato com o contador." },
+        { status: 403, headers: CORS }
       );
     }
 

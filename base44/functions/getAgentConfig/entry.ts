@@ -9,15 +9,15 @@ const CORS = {
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { status: 204, headers: CORS });
 
-  const appId = Deno.env.get("BASE44_APP_ID") || "";
-  const endpointUrl = `https://api.base44.com/api/apps/${appId}/functions/receiveDocument`;
+  const origin = req.headers.get("origin") || new URL(req.url).origin;
+  const endpointUrl = `${origin}/api/functions/receiveDocument`;
 
   return Response.json({
     success: true,
     endpoint: endpointUrl,
     method: "POST",
     contentType: "multipart/form-data",
-    fields: ["companyId", "file"],
+    fields: ["file", "companyId opcional"],
     authHeader: "Authorization: Bearer SEU_TOKEN",
   }, { headers: CORS });
 });
