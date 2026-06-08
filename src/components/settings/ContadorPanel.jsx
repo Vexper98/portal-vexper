@@ -19,6 +19,7 @@ import { format, isAfter, isBefore, addDays } from "date-fns";
 import JSZip from "jszip";
 import UpgradeModal from "../contador/UpgradeModal";
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, PieChart as RechartsPieChart, Pie, Cell } from "recharts";
+import { listAll } from "@/lib/base44-pagination";
 
 const typeColors = {
   NFe: "bg-blue-500/15 text-blue-400 border-blue-400/30",
@@ -32,6 +33,17 @@ const typeBg = {
 };
 
 const isPro = (user) => user?.role === "admin" || user?.plan === "pro_contador" || user?.pro_enabled === true;
+
+const getFiscalDate = (doc) => {
+  if (doc.dataEmissao) return doc.dataEmissao;
+  if (doc.competencia) return `${doc.competencia}-01`;
+  return (doc.uploadedAt || doc.created_date || "").slice(0, 10);
+};
+
+const getFiscalCompetencia = (doc) => {
+  if (doc.competencia) return doc.competencia;
+  return getFiscalDate(doc).slice(0, 7);
+};
 
 export default function ContadorPanel({ user }) {
   const [companies, setCompanies] = useState([]);
@@ -56,14 +68,21 @@ export default function ContadorPanel({ user }) {
     setLoading(true);
     try {
       // Admin vê todas as empresas; contadores veem apenas as vinculadas
-      const allComps = await base44.entities.Company.list("-created_date", 20000);
+      const allComps = await listAll(base44.entities.Company, "-created_date", {
+        fields: ["id", "razao_social", "nome_fantasia", "cnpj", "contadorEmail", "contador_responsavel"],
+      });
       const isAdmin = user.role === "admin";
       const comps = isAdmin
         ? allComps
         : allComps.filter(c => c.contadorEmail === user.email || c.contador_responsavel === user.email);
       setCompanies(comps);
       const compIds = new Set(comps.map(c => c.id));
-      const allDocs = await base44.entities.Document.list("-created_date", 20000);
+      const allDocs = await listAll(base44.entities.Document, "-created_date", {
+        fields: [
+          "id", "companyId", "filename", "originalFilename", "documentType", "status", "source",
+          "uploadedAt", "created_date", "dataEmissao", "competencia", "accessKey", "emitterCnpj", "fileUrl",
+        ],
+      });
       const docs = isAdmin ? allDocs : allDocs.filter(d => compIds.has(d.companyId));
       setDocuments(docs);
 
@@ -94,15 +113,16 @@ export default function ContadorPanel({ user }) {
     const matchComp = filterCompany === "all" || d.companyId === filterCompany;
     const matchType = filterType === "all" || d.documentType === filterType;
     const matchSource = filterSource === "all" || d.source === filterSource;
-    const matchCompetencia = !filterCompetencia || d.competencia === filterCompetencia;
-    const emissao = d.dataEmissao || "";
+    const docCompetencia = getFiscalCompetencia(d);
+    const matchCompetencia = !filterCompetencia || docCompetencia === filterCompetencia;
+    const emissao = getFiscalDate(d);
     const matchFrom = !filterDateFrom || emissao >= filterDateFrom;
     const matchTo   = !filterDateTo   || emissao <= filterDateTo;
     return matchSearch && matchComp && matchType && matchSource && matchCompetencia && matchFrom && matchTo;
   });
 
   // Competências disponíveis
-  const competencias = [...new Set(documents.map(d => d.competencia).filter(Boolean))].sort().reverse();
+  const competencias = [...new Set(documents.map(getFiscalCompetencia).filter(Boolean))].sort().reverse();
 
   const toggleSelect = (id) => setSelected(prev => prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id]);
   const toggleAll = () => setSelected(selected.length === filtered.length ? [] : filtered.map(d => d.id));
@@ -733,6 +753,8 @@ export default function ContadorPanel({ user }) {
                     const comp = companies.find(c => c.id === doc.companyId);
                     const isSelected = selected.includes(doc.id);
                     const type = doc.documentType || "XML";
+                    const fiscalDate = getFiscalDate(doc);
+                    const fiscalCompetencia = getFiscalCompetencia(doc);
                     return (
                       <TableRow key={doc.id}
                         className="group cursor-default transition-all"
@@ -764,10 +786,10 @@ export default function ContadorPanel({ user }) {
                          <Badge variant="outline" className={`text-[10px] font-bold px-2 ${typeColors[type]}`}>{type}</Badge>
                         </TableCell>
                         <TableCell className="text-xs text-slate-400 whitespace-nowrap">
-                         {doc.dataEmissao ? (() => { try { return format(new Date(doc.dataEmissao + "T12:00:00"), "dd/MM/yyyy"); } catch { return "—"; } })() : "—"}
+                         {fiscalDate ? (() => { try { return format(new Date(fiscalDate + "T12:00:00"), "dd/MM/yyyy"); } catch { return "—"; } })() : "—"}
                         </TableCell>
                         <TableCell className="text-xs font-semibold text-cyan-400 whitespace-nowrap">
-                         {doc.competencia ? `${doc.competencia.slice(5, 7)}/${doc.competencia.slice(0, 4)}` : "—"}
+                         {fiscalCompetencia ? `${fiscalCompetencia.slice(5, 7)}/${fiscalCompetencia.slice(0, 4)}` : "—"}
                         </TableCell>
                         <TableCell>
                          <div className="flex items-center gap-1.5">
