@@ -142,6 +142,7 @@ export default function ContadorPanel({ user }) {
       : [...new Set([...prev, ...pageIds])]
     );
   };
+  const selectAllFiltered = () => setSelected(filtered.map(d => d.id));
 
   const triggerDownload = (content, filename, mimeType = "application/xml") => {
     const blob = content instanceof Blob ? content : new Blob([content], { type: mimeType });
@@ -882,6 +883,15 @@ export default function ContadorPanel({ user }) {
                 Próxima
               </Button>
             </div>
+            <Button
+              size="sm"
+              variant="outline"
+              disabled={filtered.length === 0 || selected.length === filtered.length}
+              onClick={selectAllFiltered}
+              className="h-8 text-xs rounded-lg"
+            >
+              Selecionar todos
+            </Button>
             {selected.length > 0 && (
               <button onClick={() => setSelected([])} className="text-xs text-slate-500 hover:text-slate-300 underline-offset-2 hover:underline">
                 Limpar seleção

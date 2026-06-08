@@ -280,6 +280,7 @@ export default function Documents() {
       setSelected(prev => new Set([...prev, ...paginated.map(d => d.id)]));
     }
   };
+  const selectAllFiltered = () => setSelected(new Set(filtered.map(d => d.id)));
 
   // Competências disponíveis para filtro
   const competencias = [...new Set(documents.map(d => d.competencia).filter(Boolean))].sort().reverse();
@@ -587,6 +588,25 @@ export default function Documents() {
               {filtered.length} documento(s) · exibindo {pageStart + 1}-{Math.min(pageEnd, filtered.length)}
             </p>
             <div className="flex items-center gap-2 flex-wrap">
+              <Button
+                variant="outline"
+                size="sm"
+                disabled={filtered.length === 0 || selected.size === filtered.length}
+                onClick={selectAllFiltered}
+                className="h-8 text-xs"
+              >
+                Selecionar todos
+              </Button>
+              {selected.size > 0 && (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setSelected(new Set())}
+                  className="h-8 text-xs text-slate-500"
+                >
+                  Limpar seleção
+                </Button>
+              )}
               <select
                 value={pageSize}
                 onChange={e => { setPageSize(Number(e.target.value)); setPage(1); }}
