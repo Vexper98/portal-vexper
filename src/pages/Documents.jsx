@@ -27,6 +27,7 @@ import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { Skeleton } from "@/components/ui/skeleton";
 import XmlViewerModal from "../components/documents/XmlViewerModal";
+import { listAll } from "@/lib/base44-pagination";
 
 const STATUS = {
   recebido:  { label: "Recebido",   cls: "bg-blue-50 text-blue-700 border-blue-200" },
@@ -59,6 +60,8 @@ export default function Documents() {
   const [dateFrom, setDateFrom]       = useState("");
   const [dateTo, setDateTo]           = useState("");
   const [competenciaF, setCompetenciaF] = useState("");
+  const [page, setPage]               = useState(1);
+  const [pageSize, setPageSize]       = useState(50);
 
   const [selected, setSelected]       = useState(new Set());
   const [viewerDoc, setViewerDoc]     = useState(null);
@@ -69,8 +72,15 @@ export default function Documents() {
   const loadData = async () => {
     const [u, docs, comps] = await Promise.all([
       base44.auth.me(),
-      base44.entities.Document.list("-created_date", 500),
-      base44.entities.Company.list("-created_date", 200),
+      listAll(base44.entities.Document, "-created_date", {
+        fields: [
+          "id", "companyId", "filename", "originalFilename", "documentType", "status", "source",
+          "uploadedAt", "created_date", "dataEmissao", "competencia", "accessKey", "emitterCnpj", "fileUrl", "created_by",
+        ],
+      }),
+      listAll(base44.entities.Company, "-created_date", {
+        fields: ["id", "razao_social", "nome_fantasia", "cnpj", "contadorEmail", "contador_responsavel"],
+      }),
     ]);
     setUser(u);
     const role = u?.role;
@@ -98,6 +108,7 @@ export default function Documents() {
   };
 
   useEffect(() => { loadData(); }, []);
+  useEffect(() => { setPage(1); }, [search, statusF, typeF, companyF, sourceF, dateFrom, dateTo, competenciaF]);
 
   const getName = (cId) => {
     const c = companiesMap[cId];
@@ -251,10 +262,23 @@ export default function Documents() {
     return matchSearch && matchStatus && matchType && matchCompany && matchSource && matchFrom && matchTo && matchCompetencia;
   });
 
-  const allChecked = filtered.length > 0 && filtered.every(d => selected.has(d.id));
+  const totalPages = Math.max(1, Math.ceil(filtered.length / pageSize));
+  const safePage = Math.min(page, totalPages);
+  const pageStart = (safePage - 1) * pageSize;
+  const pageEnd = pageStart + pageSize;
+  const paginated = filtered.slice(pageStart, pageEnd);
+
+  const allChecked = paginated.length > 0 && paginated.every(d => selected.has(d.id));
   const toggleAll  = () => {
-    if (allChecked) setSelected(new Set());
-    else setSelected(new Set(filtered.map(d => d.id)));
+    if (allChecked) {
+      setSelected(prev => {
+        const n = new Set(prev);
+        paginated.forEach(d => n.delete(d.id));
+        return n;
+      });
+    } else {
+      setSelected(prev => new Set([...prev, ...paginated.map(d => d.id)]));
+    }
   };
 
   // Competências disponíveis para filtro
@@ -463,7 +487,7 @@ export default function Documents() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {filtered.map(doc => {
+              {paginated.map(doc => {
                 const st  = STATUS[doc.status] || STATUS.recebido;
                 const tp  = TYPES[doc.documentType] || TYPES.XML;
                 const src = SOURCES[doc.source] || SOURCES.manual;
@@ -557,6 +581,44 @@ export default function Documents() {
             </TableBody>
           </Table>
         </div>
+        {filtered.length > 0 && (
+          <div className="px-4 py-3 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 border-t border-slate-100">
+            <p className="text-xs text-slate-500">
+              {filtered.length} documento(s) · exibindo {pageStart + 1}-{Math.min(pageEnd, filtered.length)}
+            </p>
+            <div className="flex items-center gap-2 flex-wrap">
+              <select
+                value={pageSize}
+                onChange={e => { setPageSize(Number(e.target.value)); setPage(1); }}
+                className="h-8 rounded-md border border-slate-200 bg-white px-2 text-xs text-slate-600"
+              >
+                <option value={25}>25 por página</option>
+                <option value={50}>50 por página</option>
+                <option value={100}>100 por página</option>
+                <option value={200}>200 por página</option>
+              </select>
+              <Button
+                variant="outline"
+                size="sm"
+                disabled={safePage <= 1}
+                onClick={() => setPage(p => Math.max(1, p - 1))}
+                className="h-8 text-xs"
+              >
+                Anterior
+              </Button>
+              <span className="text-xs text-slate-500">Página {safePage} de {totalPages}</span>
+              <Button
+                variant="outline"
+                size="sm"
+                disabled={safePage >= totalPages}
+                onClick={() => setPage(p => Math.min(totalPages, p + 1))}
+                className="h-8 text-xs"
+              >
+                Próxima
+              </Button>
+            </div>
+          </div>
+        )}
       </Card>
 
       <XmlViewerModal

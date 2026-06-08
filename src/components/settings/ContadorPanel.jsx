@@ -58,6 +58,8 @@ export default function ContadorPanel({ user }) {
   const [filterCompetencia, setFilterCompetencia] = useState("");
   const [filterDateFrom, setFilterDateFrom] = useState("");
   const [filterDateTo, setFilterDateTo] = useState("");
+  const [page, setPage] = useState(1);
+  const [pageSize, setPageSize] = useState(50);
   const [selected, setSelected] = useState([]);
   const [downloading, setDownloading] = useState(false);
   const [upgradeModal, setUpgradeModal] = useState(false);
@@ -103,6 +105,7 @@ export default function ContadorPanel({ user }) {
   };
 
   useEffect(() => { if (user?.email) load(); }, [user]);
+  useEffect(() => { setPage(1); }, [search, filterCompany, filterType, filterSource, filterCompetencia, filterDateFrom, filterDateTo]);
 
   const filtered = documents.filter(d => {
     const comp = companies.find(c => c.id === d.companyId);
@@ -121,11 +124,24 @@ export default function ContadorPanel({ user }) {
     return matchSearch && matchComp && matchType && matchSource && matchCompetencia && matchFrom && matchTo;
   });
 
+  const totalPages = Math.max(1, Math.ceil(filtered.length / pageSize));
+  const safePage = Math.min(page, totalPages);
+  const pageStart = (safePage - 1) * pageSize;
+  const pageEnd = pageStart + pageSize;
+  const paginated = filtered.slice(pageStart, pageEnd);
+
   // Competências disponíveis
   const competencias = [...new Set(documents.map(getFiscalCompetencia).filter(Boolean))].sort().reverse();
 
   const toggleSelect = (id) => setSelected(prev => prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id]);
-  const toggleAll = () => setSelected(selected.length === filtered.length ? [] : filtered.map(d => d.id));
+  const toggleAll = () => {
+    const pageIds = paginated.map(d => d.id);
+    const allPageSelected = pageIds.length > 0 && pageIds.every(id => selected.includes(id));
+    setSelected(prev => allPageSelected
+      ? prev.filter(id => !pageIds.includes(id))
+      : [...new Set([...prev, ...pageIds])]
+    );
+  };
 
   const triggerDownload = (content, filename, mimeType = "application/xml") => {
     const blob = content instanceof Blob ? content : new Blob([content], { type: mimeType });
@@ -717,7 +733,7 @@ export default function ContadorPanel({ user }) {
             <TableHeader>
               <TableRow style={{ borderColor: "rgba(255,255,255,0.05)", background: "rgba(255,255,255,0.02)" }}>
                 <TableHead className="w-10 pl-6">
-                  <input type="checkbox" checked={selected.length === filtered.length && filtered.length > 0} onChange={toggleAll}
+                  <input type="checkbox" checked={paginated.length > 0 && paginated.every(d => selected.includes(d.id))} onChange={toggleAll}
                     className="rounded border-slate-600 accent-blue-500 cursor-pointer" />
                 </TableHead>
                 <TableHead className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Arquivo</TableHead>
@@ -749,7 +765,7 @@ export default function ContadorPanel({ user }) {
                 </TableRow>
               ) : (
                 <>
-                  {filtered.map((doc, i) => {
+                  {paginated.map((doc) => {
                     const comp = companies.find(c => c.id === doc.companyId);
                     const isSelected = selected.includes(doc.id);
                     const type = doc.documentType || "XML";
@@ -831,7 +847,41 @@ export default function ContadorPanel({ user }) {
 
         {filtered.length > 0 && (
           <div className="px-6 py-3 flex items-center justify-between" style={{ borderTop: "1px solid rgba(255,255,255,0.05)" }}>
-            <p className="text-xs text-slate-500">{filtered.length} documento(s) · {selected.length} selecionado(s)</p>
+            <p className="text-xs text-slate-500">
+              {filtered.length} documento(s) · exibindo {pageStart + 1}-{Math.min(pageEnd, filtered.length)} · {selected.length} selecionado(s)
+            </p>
+            <div className="flex items-center gap-2">
+              <select
+                value={pageSize}
+                onChange={e => { setPageSize(Number(e.target.value)); setPage(1); }}
+                className="h-8 rounded-lg px-2 text-xs"
+                style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", color: "#94a3b8" }}
+              >
+                <option value={25}>25 por página</option>
+                <option value={50}>50 por página</option>
+                <option value={100}>100 por página</option>
+                <option value={200}>200 por página</option>
+              </select>
+              <Button
+                size="sm"
+                variant="outline"
+                disabled={safePage <= 1}
+                onClick={() => setPage(p => Math.max(1, p - 1))}
+                className="h-8 text-xs rounded-lg"
+              >
+                Anterior
+              </Button>
+              <span className="text-xs text-slate-500">Página {safePage} de {totalPages}</span>
+              <Button
+                size="sm"
+                variant="outline"
+                disabled={safePage >= totalPages}
+                onClick={() => setPage(p => Math.min(totalPages, p + 1))}
+                className="h-8 text-xs rounded-lg"
+              >
+                Próxima
+              </Button>
+            </div>
             {selected.length > 0 && (
               <button onClick={() => setSelected([])} className="text-xs text-slate-500 hover:text-slate-300 underline-offset-2 hover:underline">
                 Limpar seleção
