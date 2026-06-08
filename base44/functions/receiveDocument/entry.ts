@@ -148,13 +148,13 @@ async function processSingleDocument(base44, companyId, filename, xmlContent, do
     const existing = await base44.asServiceRole.entities.Document.filter({ companyId, accessKey });
     if (existing?.length > 0) {
       await saveLog(base44, companyId, filename, `Duplicado ignorado | Chave: ${accessKey}`, "warning");
-      return { success: false, filename, message: "Documento duplicado: chave de acesso já registrada", documentId: existing[0].id, duplicate: true };
+      return { success: true, filename, message: "Documento já recebido anteriormente. Duplicado ignorado.", documentId: existing[0].id, duplicate: true };
     }
   } else {
     const contentHash = await sha256(xmlContent);
     const existing = await base44.asServiceRole.entities.Document.filter({ companyId, filename });
     if (existing?.length > 0 && existing.some(d => d.contentHash === contentHash)) {
-      return { success: false, filename, message: "Documento duplicado: mesmo arquivo já enviado", duplicate: true };
+      return { success: true, filename, message: "Documento já recebido anteriormente. Duplicado ignorado.", duplicate: true };
     }
   }
 
@@ -380,7 +380,7 @@ Deno.serve(async (req) => {
     // Se era um único arquivo, responde no formato antigo para compatibilidade
     if (filesToProcess.length === 1) {
       const r = results[0];
-      const status = r.success ? 200 : (r.duplicate ? 409 : 500);
+      const status = r.success || r.duplicate ? 200 : 500;
       return Response.json({ ...r }, { status, headers: CORS });
     }
 
